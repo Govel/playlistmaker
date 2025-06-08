@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp">
+
+        <ImageButton
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:backgroundTint="#00FFFFFF"
+            android:src="@drawable/arrowback" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="12dp"
+            android:text="@string/settings"
+            android:textColor="@color/yp_black"
+            android:textSize="@dimen/primary_text_size" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/frame_layout_height_61dp"
+        android:layout_marginTop="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:text="@string/dark_theme"
+            android:textColor="@color/yp_black"
+            android:textSize="@dimen/medium_text_size"
+            android:layout_marginStart="@dimen/medium_text_size" />
+
+        <Switch
+            android:layout_width="56dp"
+            android:layout_height="40dp"
+            android:layout_gravity="end|center_vertical"
+            tools:ignore="UseSwitchCompatOrMaterialXml"
+            android:layout_marginEnd="6dp"/>
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/frame_layout_height_61dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:text="@string/share_app"
+            android:textColor="@color/yp_black"
+            android:textSize="@dimen/medium_text_size"
+            android:layout_marginStart="@dimen/medium_text_size" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/yp_text_gray"
+            android:src="@drawable/share"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="@dimen/image_margin_end"
+            app:iconTint="@color/yp_text_gray" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/frame_layout_height_61dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:text="@string/write_in_support"
+            android:textColor="@color/yp_black"
+            android:textSize="@dimen/medium_text_size"
+            android:layout_marginStart="@dimen/medium_text_size" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/support"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="@dimen/image_margin_end"
+            app:iconTint="@color/yp_text_gray" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/frame_layout_height_61dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:text="@string/user_agreement"
+            android:textColor="@color/yp_black"
+            android:textSize="@dimen/medium_text_size"
+            android:layout_marginStart="@dimen/text_margin_start" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/arrowforward"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="@dimen/image_margin_end"
+            app:iconTint="@color/yp_text_gray" />
+    </FrameLayout>
+
+
+
+</LinearLayout>
+
