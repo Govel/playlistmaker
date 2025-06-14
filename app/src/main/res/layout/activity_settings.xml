@@ -15,7 +15,7 @@
             android:id="@+id/arrowback_button"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:backgroundTint="#00FFFFFF"
+            android:backgroundTint="@color/yp_white"
             android:src="@drawable/arrowback" />
 
         <TextView
