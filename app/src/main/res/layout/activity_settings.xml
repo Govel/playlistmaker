@@ -6,31 +6,37 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <LinearLayout
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/title_settings"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="4dp">
+        android:layout_height="56dp"
+        android:padding="4dp"
+        app:title="@string/settings"
+        app:navigationIcon="@drawable/arrowback"
+        app:titleTextAppearance="@style/SettingsTextStyle"
+        app:titleTextColor="@color/yp_black"
+        app:titleMarginStart="0dp">
 
-        <ImageButton
-            android:id="@+id/arrowback_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:backgroundTint="@color/yp_white"
-            android:src="@drawable/arrowback" />
+<!--        <ImageButton-->
+<!--            android:id="@+id/arrowback_button"-->
+<!--            android:layout_width="48dp"-->
+<!--            android:layout_height="48dp"-->
+<!--            android:backgroundTint="@color/yp_white"-->
+<!--            android:src="@drawable/arrowback" />-->
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="12dp"
-            android:text="@string/settings"
-            android:textColor="@color/yp_black"
-            android:textSize="@dimen/primary_text_size" />
-    </LinearLayout>
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_gravity="center"-->
+<!--            android:layout_marginStart="12dp"-->
+<!--            android:text="@string/settings"-->
+<!--            android:textColor="@color/yp_black"-->
+<!--            android:textSize="@dimen/primary_text_size" />-->
+    </com.google.android.material.appbar.MaterialToolbar>
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/frame_layout_height_61dp"
+        android:layout_height="@dimen/frame_layout_height_60dp"
         android:layout_marginTop="24dp">
 
         <TextView
@@ -54,7 +60,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/frame_layout_height_61dp">
+        android:layout_height="@dimen/frame_layout_height_60dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -77,7 +83,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/frame_layout_height_61dp">
+        android:layout_height="@dimen/frame_layout_height_60dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -99,7 +105,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/frame_layout_height_61dp">
+        android:layout_height="@dimen/frame_layout_height_60dp">
 
         <TextView
             android:layout_width="wrap_content"
