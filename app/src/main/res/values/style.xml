@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MainTextStyle" parent="Widget.MaterialComponents.Toolbar.Primary">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">@dimen/primary_text_size</item>
+    </style>
+    <style name="SettingsTextStyle" parent="Widget.MaterialComponents.Toolbar.Primary">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">@dimen/primary_text_size</item>
+    </style>
+</resources>
