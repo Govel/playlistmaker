@@ -44,9 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start|center_vertical"
             android:text="@string/dark_theme"
-            android:textColor="@color/yp_black"
-            android:textSize="@dimen/medium_text_size"
-            android:layout_marginStart="@dimen/medium_text_size" />
+            style="@style/TextStyle" />
 
         <Switch
             android:layout_width="56dp"
@@ -67,9 +65,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start|center_vertical"
             android:text="@string/share_app"
-            android:textColor="@color/yp_black"
-            android:textSize="@dimen/medium_text_size"
-            android:layout_marginStart="@dimen/medium_text_size" />
+            style="@style/TextStyle" />
 
         <ImageView
             android:layout_width="wrap_content"
@@ -90,9 +86,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start|center_vertical"
             android:text="@string/write_in_support"
-            android:textColor="@color/yp_black"
-            android:textSize="@dimen/medium_text_size"
-            android:layout_marginStart="@dimen/medium_text_size" />
+            style="@style/TextStyle" />
 
         <ImageView
             android:layout_width="wrap_content"
@@ -112,9 +106,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start|center_vertical"
             android:text="@string/user_agreement"
-            android:textColor="@color/yp_black"
-            android:textSize="@dimen/medium_text_size"
-            android:layout_marginStart="@dimen/text_margin_start" />
+            style="@style/TextStyle" />
 
         <ImageView
             android:layout_width="wrap_content"

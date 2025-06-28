@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="MainTextStyle" parent="Widget.MaterialComponents.Toolbar.Primary">
-        <item name="android:fontFamily">sans-serif-medium</item>
+    <style name="MainTextStyle">
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textSize">@dimen/primary_text_size</item>
+        <item name="titleTextColor">@color/yp_white</item>
+    </style>
+    <style name="SettingsTextStyle">
+        <item name="android:fontFamily">@font/ys_display_medium</item>
         <item name="android:textSize">@dimen/primary_text_size</item>
     </style>
-    <style name="SettingsTextStyle" parent="Widget.MaterialComponents.Toolbar.Primary">
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textSize">@dimen/primary_text_size</item>
+    <style name="TextStyle">
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textColor">@color/yp_black</item>
+        <item name="android:textSize">@dimen/medium_text_size</item>
+        <item name="android:layout_marginStart">@dimen/text_margin_start</item>
     </style>
+    <style name="ButtonMainStyle">
+        <item name="backgroundTint">@color/yp_white</item>
+        <item name="android:textColor">@color/yp_black</item>
+        <item name="android:textSize">@dimen/primary_text_size</item>
+        <item name="fontFamily">@font/ys_display_medium</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="iconTint">@color/yp_black</item>
+        <item name="iconPadding">@dimen/icon_padding</item>
+        <item name="cornerRadius">@dimen/button_corner_radius</item>
+        <item name="iconGravity">textStart</item>
+    </style>
+
 </resources>
