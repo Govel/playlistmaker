@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:theme="@style/Theme.PlaylistMaker"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/yp_blue"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="?attr/colorPrimary" >
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
         android:layout_gravity="start"
+        android:layout_marginBottom="36dp"
         app:title="@string/app_name"
         app:titleTextAppearance="@style/MainTextStyle"
-        app:titleTextColor="@color/yp_white"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="36dp"
-         />
+        app:titleTextColor="@color/yp_white" />
 
     <Button
         android:id="@+id/search_button"
