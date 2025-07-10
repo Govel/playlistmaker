@@ -15,11 +15,10 @@
         app:titleMarginStart="0dp"
         app:titleTextAppearance="@style/HeaderTextStyle" />
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="36dp"
         android:id="@+id/search_container"
-        android:orientation="horizontal"
         android:background="@drawable/rounded_edittext"
         android:layout_marginHorizontal="16dp"
         android:layout_marginVertical="8dp"
@@ -27,8 +26,7 @@
 
         <EditText
             android:id="@+id/search_bar"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center|start"
             android:background="@null"
@@ -54,5 +52,5 @@
             android:layout_marginEnd="12dp"
             android:src="@drawable/clean_the_search_query"
             android:visibility="gone" />
-    </LinearLayout>
+    </FrameLayout>
 </LinearLayout>
