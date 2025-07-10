@@ -10,7 +10,7 @@
         <item name="colorPrimaryVariant">@color/yp_gray</item>
         <item name="colorOnPrimary">@color/yp_black</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/yp_white</item>
+        <item name="colorSecondary">@color/yp_gray</item>
         <item name="colorSecondaryVariant">@color/yp_white</item>
         <item name="colorOnSecondary">@color/yp_black</item>
         <!-- Status bar color. -->

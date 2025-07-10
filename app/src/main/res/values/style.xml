@@ -34,17 +34,4 @@
         <item name="iconGravity">textStart</item>
     </style>
 
-    <style name="ButtonMainStyleTabBar" parent="Widget.MaterialComponents.Button.UnelevatedButton">
-        <item name="backgroundTint">@color/yp_white</item>
-        <item name="android:textColor">@color/yp_black</item>
-        <item name="android:textSize">@dimen/button_text_size_tab_bar</item>
-        <item name="fontFamily">@font/ys_display_regular</item>
-        <item name="textAllCaps">false</item>
-        <item name="android:foreground">?attr/selectableItemBackground</item>
-        <item name="iconTint">@color/yp_black</item>
-        <item name="iconPadding">@dimen/icon_padding</item>
-        <item name="cornerRadius">0dp</item>
-        <item name="iconGravity">textStart</item>
-    </style>
-
 </resources>

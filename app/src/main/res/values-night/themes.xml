@@ -18,5 +18,8 @@
         <item name="navigationIconTint">@color/yp_white</item>
         <!-- Customize your theme here. -->
 
+        <item name="colorControlActivated">@color/yp_blue</item>
+
+
     </style>>
 </resources>
