@@ -5,7 +5,7 @@
         <item name="android:textSize">@dimen/primary_text_size</item>
         <item name="titleTextColor">@color/yp_white</item>
     </style>
-    <style name="SettingsTextStyle">
+    <style name="HeaderTextStyle">
         <item name="android:fontFamily">@font/ys_display_medium</item>
         <item name="android:textSize">@dimen/primary_text_size</item>
         <item name="titleTextColor">@color/yp_white</item>
@@ -29,6 +29,5 @@
         <item name="iconGravity">textStart</item>
         <item name="android:outlineProvider">none</item>
     </style>
-
 
 </resources>

@@ -6,105 +6,117 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/title_settings"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        app:title="@string/settings"
-        app:navigationIcon="@drawable/arrowback"
-        app:titleTextAppearance="@style/SettingsTextStyle"
-        app:titleMarginStart="0dp"
-        style="@style/Theme.PlaylistMaker"/>
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/frame_layout_height_60dp"
-        android:layout_marginTop="24dp">
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/title_settings"
+            style="@style/Theme.PlaylistMaker"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            app:navigationIcon="@drawable/arrowback"
+            app:title="@string/settings"
+            app:titleMarginStart="0dp"
+            app:titleTextAppearance="@style/HeaderTextStyle" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start|center_vertical"
-            android:text="@string/dark_theme"
-            style="@style/TextStyle" />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/frame_layout_height_60dp"
+            android:layout_marginTop="24dp">
 
-        <Switch
-            android:layout_width="56dp"
-            android:layout_height="40dp"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="6dp"
-            android:enabled="false"
-            tools:ignore="UseSwitchCompatOrMaterialXml"
-            style="@style/Theme.PlaylistMaker"/>
-    </FrameLayout>
+            <TextView
+                style="@style/TextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:text="@string/dark_theme" />
 
-    <FrameLayout
-        android:id="@+id/share"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/frame_layout_height_60dp"
-        android:foreground="?attr/selectableItemBackground" >
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start|center_vertical"
-            android:text="@string/share_app"
-            style="@style/TextStyle" />
+            <Switch
+                style="@style/Theme.PlaylistMaker"
+                android:layout_width="56dp"
+                android:layout_height="40dp"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="6dp"
+                android:enabled="false"
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
+        </FrameLayout>
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/yp_text_gray"
-            android:src="@drawable/share"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="@dimen/image_margin_end"
-            app:iconTint="@color/yp_text_gray" />
-    </FrameLayout>
+        <FrameLayout
+            android:id="@+id/share"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/frame_layout_height_60dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
 
-    <FrameLayout
-        android:id="@+id/write_in_support"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/frame_layout_height_60dp"
-        android:foreground="?attr/selectableItemBackground" >
+            <TextView
+                style="@style/TextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:text="@string/share_app" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start|center_vertical"
-            android:text="@string/write_in_support"
-            style="@style/TextStyle" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="@dimen/image_margin_end"
+                android:backgroundTint="@color/yp_gray"
+                android:src="@drawable/share"
+                app:iconTint="@color/yp_gray" />
+        </FrameLayout>
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/support"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="@dimen/image_margin_end"
-            app:iconTint="@color/yp_text_gray" />
-    </FrameLayout>
+        <FrameLayout
+            android:id="@+id/write_in_support"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/frame_layout_height_60dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
 
-    <FrameLayout
-        android:id="@+id/user_agreement"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/frame_layout_height_60dp"
-        android:foreground="?attr/selectableItemBackground" >
+            <TextView
+                style="@style/TextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:text="@string/write_in_support" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start|center_vertical"
-            android:text="@string/user_agreement"
-            style="@style/TextStyle" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="@dimen/image_margin_end"
+                android:src="@drawable/support"
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/arrowforward"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="@dimen/image_margin_end"
-            app:iconTint="@color/yp_text_gray" />
-    </FrameLayout>
+                app:iconTint="@color/yp_gray" />
+        </FrameLayout>
 
+        <FrameLayout
+            android:id="@+id/user_agreement"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/frame_layout_height_60dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
 
+            <TextView
+                style="@style/TextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:text="@string/user_agreement" />
 
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="@dimen/image_margin_end"
+                android:src="@drawable/arrowforward"
+                app:iconTint="@color/yp_gray" />
+        </FrameLayout>
+    </LinearLayout>
 </LinearLayout>
 
