@@ -8,7 +8,7 @@
     <color name="yp_gray">#AEAFB4</color>
     <color name="icon_black">#1A1B22</color>
     <color name="yp_light_gray">#E6E8EB</color>
-    <color name="colorPrimaryVariant">@color/yp_gray</color>
-    <color name="colorPrimary">@color/yp_blue</color>
+    <color name="colorPrimaryVariant">@color/yp_black</color>
+    <color name="colorPrimary">@color/yp_white</color>
     <color name="colorOnPrimary">@color/yp_black</color>
 </resources>
