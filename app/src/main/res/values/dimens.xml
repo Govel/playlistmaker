@@ -5,10 +5,9 @@
     <dimen name="button_corner_radius">16dp</dimen>
     <dimen name="image_margin_end">12dp</dimen>
     <dimen name="text_margin_start">16dp</dimen>
-    <dimen name="button_text_size_tab_bar">12sp</dimen>
+    <dimen name="small_text_size">12sp</dimen>
     <dimen name="primary_text_size">22sp</dimen>
     <dimen name="medium_text_size">16sp</dimen>
-    <dimen name="small_text_size">11sp</dimen>
 
 
 </resources>

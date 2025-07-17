@@ -25,7 +25,6 @@ class SearchActivity : AppCompatActivity() {
         setContentView(R.layout.activity_search)
         val materialToolbar: MaterialToolbar = findViewById(R.id.title_search)
         val clearButton = findViewById<ImageView>(R.id.search_clearIcon)
-        val container = findViewById<FrameLayout>(R.id.search_container)
         val searchEditText = findViewById<EditText>(R.id.search_bar)
         val tracks: List<Track> = listOf(
             Track(

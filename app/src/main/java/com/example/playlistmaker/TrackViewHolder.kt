@@ -22,7 +22,6 @@ class TrackViewHolder(item: View) : RecyclerView.ViewHolder(item) {
         tvTrackName.text = data.trackName
         tvTrackBand.text = data.artistName
         tvTrackTime.text = data.trackTime
-//        val imageCoverRadius = dpToPx(2f, itemView.context)
         Glide.with(itemView.context)
             .load(data.artworkUrl100)
             .placeholder(R.drawable.placeholder)
