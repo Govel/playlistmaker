@@ -11,4 +11,5 @@
     <color name="colorPrimaryVariant">@color/yp_gray</color>
     <color name="colorPrimary">@color/yp_blue</color>
     <color name="colorOnPrimary">@color/yp_black</color>
+    <color name="gray_white">@color/yp_gray</color>
 </resources>
