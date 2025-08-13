@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -17,13 +17,12 @@
         app:titleTextAppearance="@style/HeaderTextStyle" />
 
     <FrameLayout
+        android:id="@+id/search_container"
         android:layout_width="match_parent"
         android:layout_height="36dp"
-        android:id="@+id/search_container"
-        android:background="@drawable/rounded_edittext"
         android:layout_marginHorizontal="16dp"
         android:layout_marginVertical="8dp"
-        >
+        android:background="@drawable/rounded_edittext">
 
         <EditText
             android:id="@+id/search_bar"
@@ -36,9 +35,11 @@
             android:drawablePadding="8dp"
             android:fontFamily="@font/ys_display_regular"
             android:hint="@string/search"
+            android:imeOptions="actionDone"
             android:maxLines="1"
             android:paddingStart="12dp"
             android:paddingEnd="0dp"
+            android:singleLine="true"
             android:textColor="@color/yp_black"
             android:textColorHint="@color/colorPrimaryVariant"
             android:textColorLink="@color/yp_blue"
@@ -59,10 +60,8 @@
         android:id="@+id/rvSearchResult"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:orientation="vertical"
-        tools:listitem="@layout/rv_tracks"/>
-
-
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/rv_tracks" />
 
 </LinearLayout>
