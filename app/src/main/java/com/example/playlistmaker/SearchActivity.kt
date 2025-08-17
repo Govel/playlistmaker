@@ -1,23 +1,39 @@
 package com.example.playlistmaker
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
-import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 
 class SearchActivity : AppCompatActivity() {
     private var editTextSaver: String = TEXT_DEF
     private var searchEditText: EditText? = null
+    private val iTunesBaseUrl = "https://itunes.apple.com"
+
+    private val retrofit = Retrofit.Builder()
+        .baseUrl(iTunesBaseUrl)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    private val iTunesService = retrofit.create(ITunesApi::class.java)
+    private val tracks = ArrayList<Track>()
+    private val adapter = TrackAdapter(tracks)
+    private var lastCall: Call<TrackResponse>? = null
 
     @SuppressLint("WrongViewCast")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,40 +42,12 @@ class SearchActivity : AppCompatActivity() {
         val materialToolbar: MaterialToolbar = findViewById(R.id.title_search)
         val clearButton = findViewById<ImageView>(R.id.search_clearIcon)
         val searchEditText = findViewById<EditText>(R.id.search_bar)
-        val tracks: List<Track> = listOf(
-            Track(
-                "Smells Like Teen Spirit",
-                "Nirvana",
-                "5:01",
-                "https://is5-ssl.mzstatic.com/image/thumb/Music115/v4/7b/58/c2/7b58c21a-2b51-2bb2-e59a-9bb9b96ad8c3/00602567924166.rgb.jpg/100x100bb.jpg"
-            ),
-            Track(
-                "Billie Jean",
-                "Michael Jackson",
-                "4:35",
-                "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/3d/9d/38/3d9d3811-71f0-3a0e-1ada-3004e56ff852/827969428726.jpg/100x100bb.jpg"
-            ),
-            Track(
-                "Stayin' Alive",
-                "Bee Gees",
-                "4:10",
-                "https://is4-ssl.mzstatic.com/image/thumb/Music115/v4/1f/80/1f/1f801fc1-8c0f-ea3e-d3e5-387c6619619e/16UMGIM86640.rgb.jpg/100x100bb.jpg"
-            ),
-            Track(
-                "Whole Lotta Love",
-                "Led Zeppelin",
-                "5:33",
-                "https://is2-ssl.mzstatic.com/image/thumb/Music62/v4/7e/17/e3/7e17e33f-2efa-2a36-e916-7f808576cf6b/mzm.fyigqcbs.jpg/100x100bb.jpg"
-            ),
-            Track(
-                "Sweet Child O'Mine",
-                "Guns N' Roses",
-                "5:03",
-                "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/a0/4d/c4/a04dc484-03cc-02aa-fa82-5334fcb4bc16/18UMGIM24878.rgb.jpg/100x100bb.jpg"
-            )
-        )
         val rvSearchResult = findViewById<RecyclerView>(R.id.rvSearchResult)
-        rvSearchResult.adapter = TrackAdapter(tracks)
+        val searchIsEmpty = findViewById<LinearLayout>(R.id.search_is_empty)
+        val searchNoInternet = findViewById<LinearLayout>(R.id.search_no_internet)
+        val btSearchUpdate = findViewById<Button>(R.id.bt_search_update)
+
+        rvSearchResult.adapter = adapter
 
         materialToolbar.setNavigationOnClickListener {
             finish()
@@ -77,10 +65,97 @@ class SearchActivity : AppCompatActivity() {
             }
         }
         searchEditText.addTextChangedListener(searchTextWatcher)
+        searchEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                if (searchEditText.text.isNotEmpty()) {
+                    lastCall = iTunesService.search(searchEditText.text.toString())
+                    lastCall?.enqueue(object : Callback<TrackResponse> {
+                        @SuppressLint("NotifyDataSetChanged")
+                        override fun onResponse(
+                            call: Call<TrackResponse?>,
+                            response: Response<TrackResponse?>
+                        ) {
+                            if (response.code() == 200) {
+                                tracks.clear()
+                                searchNoInternet.visibility = View.GONE
+                                searchIsEmpty.visibility = View.GONE
+                                if (response.body()?.results?.isNotEmpty() == true) {
+                                    tracks.addAll(response.body()?.results!!)
+                                    adapter.notifyDataSetChanged()
+                                } else {
+                                    tracks.clear()
+                                    adapter.notifyDataSetChanged()
+                                    searchNoInternet.visibility = View.GONE
+                                    searchIsEmpty.visibility = View.VISIBLE
+                                }
+                            } else {
+                                tracks.clear()
+                                adapter.notifyDataSetChanged()
+                                searchIsEmpty.visibility = View.GONE
+                                searchNoInternet.visibility = View.VISIBLE
+                            }
+                        }
+
+                        override fun onFailure(call: Call<TrackResponse?>, t: Throwable) {
+                            tracks.clear()
+                            adapter.notifyDataSetChanged()
+                            searchIsEmpty.visibility = View.GONE
+                            searchNoInternet.visibility = View.VISIBLE
+                        }
+                    })
+                }
+                true
+            }
+            false
+        }
+        btSearchUpdate.setOnClickListener {
+            val retryCall = lastCall?.clone()
+            lastCall = retryCall
+            retryCall?.enqueue(object : Callback<TrackResponse> {
+                @SuppressLint("NotifyDataSetChanged")
+                override fun onResponse(
+                    call: Call<TrackResponse?>,
+                    response: Response<TrackResponse?>
+                ) {
+                    if (response.code() == 200) {
+                        tracks.clear()
+                        searchNoInternet.visibility = View.GONE
+                        searchIsEmpty.visibility = View.GONE
+                        if (response.body()?.results?.isNotEmpty() == true) {
+                            tracks.addAll(response.body()?.results!!)
+                            adapter.notifyDataSetChanged()
+                        } else {
+                            tracks.clear()
+                            adapter.notifyDataSetChanged()
+                            searchNoInternet.visibility = View.GONE
+                            searchIsEmpty.visibility = View.VISIBLE
+                        }
+                    } else {
+                        tracks.clear()
+                        adapter.notifyDataSetChanged()
+                        searchIsEmpty.visibility = View.GONE
+                        searchNoInternet.visibility = View.VISIBLE
+                    }
+                }
+
+                override fun onFailure(call: Call<TrackResponse?>, t: Throwable) {
+                    tracks.clear()
+                    adapter.notifyDataSetChanged()
+                    searchIsEmpty.visibility = View.GONE
+                    searchNoInternet.visibility = View.VISIBLE
+                }
+            })
+        }
+
         clearButton.setOnClickListener {
-            searchEditText.setText("");
+            searchEditText.setText("")
             searchEditText.clearFocus()
-            val imm = it.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            tracks.clear()
+            adapter.notifyDataSetChanged()
+            searchNoInternet.visibility = View.GONE
+            searchIsEmpty.visibility = View.GONE
+            val imm =
+                it.context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
         }
     }

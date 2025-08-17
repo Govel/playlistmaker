@@ -19,5 +19,4 @@ class TrackAdapter (
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(tracks[position])
     }
-
 }

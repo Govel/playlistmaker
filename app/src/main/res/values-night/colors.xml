@@ -12,4 +12,7 @@
     <color name="colorPrimary">@color/yp_white</color>
     <color name="colorOnPrimary">@color/yp_white</color>
     <color name="gray_white">@color/yp_white</color>
+    <color name="icon_placeholder_color">@color/yp_white</color>
+    <color name="bt_bg_color_variant">@color/yp_white</color>"
+    <color name="bt_txt_color_variant">@color/icon_black</color>"
 </resources>
