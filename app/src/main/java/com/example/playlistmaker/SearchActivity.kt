@@ -1,16 +1,16 @@
 package com.example.playlistmaker
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.Toast
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
@@ -33,6 +33,7 @@ class SearchActivity : AppCompatActivity() {
     private val iTunesService = retrofit.create(ITunesApi::class.java)
     private val tracks = ArrayList<Track>()
     private val adapter = TrackAdapter(tracks)
+    private var lastCall: Call<TrackResponse>? = null
 
     @SuppressLint("WrongViewCast")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,6 +43,10 @@ class SearchActivity : AppCompatActivity() {
         val clearButton = findViewById<ImageView>(R.id.search_clearIcon)
         val searchEditText = findViewById<EditText>(R.id.search_bar)
         val rvSearchResult = findViewById<RecyclerView>(R.id.rvSearchResult)
+        val searchIsEmpty = findViewById<LinearLayout>(R.id.search_is_empty)
+        val searchNoInternet = findViewById<LinearLayout>(R.id.search_no_internet)
+        val btSearchUpdate = findViewById<Button>(R.id.bt_search_update)
+
         rvSearchResult.adapter = adapter
 
         materialToolbar.setNavigationOnClickListener {
@@ -63,52 +68,94 @@ class SearchActivity : AppCompatActivity() {
         searchEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 if (searchEditText.text.isNotEmpty()) {
-                    iTunesService.search(searchEditText.text.toString())
-                        .enqueue(object : Callback<TrackResponse> {
-                            @SuppressLint("NotifyDataSetChanged")
-                            override fun onResponse(
-                                call: Call<TrackResponse?>,
-                                response: Response<TrackResponse?>
-                            ) {
-                                if (response.code() == 200) {
-                                    tracks.clear()
-                                    if (response.body()?.results?.isNotEmpty() == true) {
-                                        tracks.addAll(response.body()?.results!!)
-                                        adapter.notifyDataSetChanged()
-                                    }
-                                    if (tracks.isEmpty()) {
-                                        Toast.makeText(
-                                            this@SearchActivity, "Ничего не найдено!",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
+                    lastCall = iTunesService.search(searchEditText.text.toString())
+                    lastCall?.enqueue(object : Callback<TrackResponse> {
+                        @SuppressLint("NotifyDataSetChanged")
+                        override fun onResponse(
+                            call: Call<TrackResponse?>,
+                            response: Response<TrackResponse?>
+                        ) {
+                            if (response.code() == 200) {
+                                tracks.clear()
+                                searchNoInternet.visibility = View.GONE
+                                searchIsEmpty.visibility = View.GONE
+                                if (response.body()?.results?.isNotEmpty() == true) {
+                                    tracks.addAll(response.body()?.results!!)
+                                    adapter.notifyDataSetChanged()
                                 } else {
-                                    Toast.makeText(
-                                        this@SearchActivity,
-                                        response.code().toString(),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    tracks.clear()
+                                    adapter.notifyDataSetChanged()
+                                    searchNoInternet.visibility = View.GONE
+                                    searchIsEmpty.visibility = View.VISIBLE
                                 }
+                            } else {
+                                tracks.clear()
+                                adapter.notifyDataSetChanged()
+                                searchIsEmpty.visibility = View.GONE
+                                searchNoInternet.visibility = View.VISIBLE
                             }
+                        }
 
-                            override fun onFailure(call: Call<TrackResponse?>, t: Throwable) {
-                                Toast.makeText(
-                                    this@SearchActivity,
-                                    t.message.toString(),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        })
+                        override fun onFailure(call: Call<TrackResponse?>, t: Throwable) {
+                            tracks.clear()
+                            adapter.notifyDataSetChanged()
+                            searchIsEmpty.visibility = View.GONE
+                            searchNoInternet.visibility = View.VISIBLE
+                        }
+                    })
                 }
                 true
             }
             false
         }
+        btSearchUpdate.setOnClickListener {
+            val retryCall = lastCall?.clone()
+            lastCall = retryCall
+            retryCall?.enqueue(object : Callback<TrackResponse> {
+                @SuppressLint("NotifyDataSetChanged")
+                override fun onResponse(
+                    call: Call<TrackResponse?>,
+                    response: Response<TrackResponse?>
+                ) {
+                    if (response.code() == 200) {
+                        tracks.clear()
+                        searchNoInternet.visibility = View.GONE
+                        searchIsEmpty.visibility = View.GONE
+                        if (response.body()?.results?.isNotEmpty() == true) {
+                            tracks.addAll(response.body()?.results!!)
+                            adapter.notifyDataSetChanged()
+                        } else {
+                            tracks.clear()
+                            adapter.notifyDataSetChanged()
+                            searchNoInternet.visibility = View.GONE
+                            searchIsEmpty.visibility = View.VISIBLE
+                        }
+                    } else {
+                        tracks.clear()
+                        adapter.notifyDataSetChanged()
+                        searchIsEmpty.visibility = View.GONE
+                        searchNoInternet.visibility = View.VISIBLE
+                    }
+                }
+
+                override fun onFailure(call: Call<TrackResponse?>, t: Throwable) {
+                    tracks.clear()
+                    adapter.notifyDataSetChanged()
+                    searchIsEmpty.visibility = View.GONE
+                    searchNoInternet.visibility = View.VISIBLE
+                }
+            })
+        }
+
         clearButton.setOnClickListener {
-            searchEditText.setText("");
+            searchEditText.setText("")
             searchEditText.clearFocus()
+            tracks.clear()
+            adapter.notifyDataSetChanged()
+            searchNoInternet.visibility = View.GONE
+            searchIsEmpty.visibility = View.GONE
             val imm =
-                it.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                it.context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
         }
     }
