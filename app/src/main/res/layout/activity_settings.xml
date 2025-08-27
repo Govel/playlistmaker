@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/main">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -22,28 +22,16 @@
             app:titleMarginStart="0dp"
             app:titleTextAppearance="@style/HeaderTextStyle" />
 
-        <FrameLayout
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/themeSwitcher"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/frame_layout_height_60dp"
-            android:layout_marginTop="24dp">
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            style="@style/TextStyle"
+            android:paddingEnd="12dp"
+            android:text="@string/dark_theme"
+            />
 
-            <TextView
-                style="@style/TextStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start|center_vertical"
-                android:text="@string/dark_theme" />
-
-            <Switch
-                style="@style/Theme.PlaylistMaker"
-                android:layout_width="56dp"
-                android:layout_height="40dp"
-                android:layout_gravity="end|center_vertical"
-                android:layout_marginEnd="6dp"
-                android:enabled="true"
-                android:checked="true"
-                tools:ignore="UseSwitchCompatOrMaterialXml" />
-        </FrameLayout>
 
         <FrameLayout
             android:id="@+id/share"
@@ -119,4 +107,3 @@
         </FrameLayout>
     </LinearLayout>
 </LinearLayout>
-

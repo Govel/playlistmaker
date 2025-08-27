@@ -1,8 +1,6 @@
 package com.example.playlistmaker
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -19,11 +17,10 @@ class TrackViewHolder(item: View) : RecyclerView.ViewHolder(item) {
     private val tvTrackBand: TextView = itemView.findViewById(R.id.tvTrackBand)
     private val tvTrackTime: TextView = itemView.findViewById(R.id.tvTrackTime)
     @SuppressLint("RestrictedApi")
-    fun bind(data: Track) {
-        val durationMillis = data.trackTimeMillis
+    fun bind(data: Track?) {
+        val durationMillis = data!!.trackTimeMillis
         val dateFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
         val formatted = dateFormat.format(Date(durationMillis))
-
         tvTrackName.text = data.trackName
         tvTrackBand.text = data.artistName
         tvTrackTime.text = formatted
@@ -31,13 +28,7 @@ class TrackViewHolder(item: View) : RecyclerView.ViewHolder(item) {
             .load(data.artworkUrl100)
             .placeholder(R.drawable.placeholder_cover)
             .centerCrop()
-            .transform(RoundedCorners(dpToPx(2f, itemView.context)))
+            .transform(RoundedCorners(LocalUtils().dpToPx(2f, itemView.context)))
             .into(ivTrackCover)
-    }
-    private fun dpToPx(dp: Float, context: Context): Int {
-        return TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            dp,
-            context.resources.displayMetrics).toInt()
     }
 }

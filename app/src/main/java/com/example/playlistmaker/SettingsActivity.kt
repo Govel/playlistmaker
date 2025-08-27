@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 
 class SettingsActivity : AppCompatActivity() {
@@ -44,6 +45,16 @@ class SettingsActivity : AppCompatActivity() {
             val userAgreementUrl = getString(R.string.user_agreement_url)
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(userAgreementUrl))
             startActivity(browserIntent)
+        }
+        val themeSwitcher = findViewById<SwitchMaterial>(R.id.themeSwitcher)
+        val isDarkTheme = (applicationContext as App).darkTheme
+        themeSwitcher.isChecked = isDarkTheme
+        themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
+            (applicationContext as App).switchTheme(checked)
+            val sharedPrefs = getSharedPreferences(SearchHistory.SHARED_PREFERENСES, MODE_PRIVATE)
+            sharedPrefs.edit()
+                .putBoolean(THEME_SWITCH_KEY, checked)
+                .apply()
         }
     }
 }
