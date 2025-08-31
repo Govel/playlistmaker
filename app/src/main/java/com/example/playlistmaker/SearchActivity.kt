@@ -20,10 +20,8 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-
 class SearchActivity : AppCompatActivity() {
     private var editTextSaver: String = TEXT_DEF
-    private var searchEditText: EditText? = null
     private val iTunesBaseUrl = "https://itunes.apple.com"
 
     private val retrofit = Retrofit.Builder()
@@ -32,22 +30,63 @@ class SearchActivity : AppCompatActivity() {
         .build()
     private val iTunesService = retrofit.create(ITunesApi::class.java)
     private val tracks = ArrayList<Track>()
-    private val adapter = TrackAdapter(tracks)
+    private val tracksHistory = mutableListOf<Track>()
+    private var adapter = TrackAdapter(tracks) { clickedTrack ->
+        searchHistory.push(clickedTrack)
+        loadSearchHistory()
+    }
+    private val adapterHistory = HistoryTrackAdapter(tracksHistory)
     private var lastCall: Call<TrackResponse>? = null
+    private lateinit var materialToolbar: MaterialToolbar
+    private lateinit var searchEditText: EditText
+    private lateinit var clearButton: ImageView
+    private lateinit var rvSearchResult: RecyclerView
+    private lateinit var rvSearchHistory: RecyclerView
+    private lateinit var btSearchUpdate: Button
+    private lateinit var btClearHistory: Button
+    private lateinit var llSearchIsEmpty: LinearLayout
+    private lateinit var llSearchNoInternet: LinearLayout
+    private lateinit var llSearchHistory: LinearLayout
+    private lateinit var searchHistory: SearchHistory
+    companion object {
+        private const val SHARED_PREFERENСES = "shared_prefs"
+        const val EDIT_TEXT = "EDIT_TEXT"
+        const val TEXT_DEF = ""
+    }
 
     @SuppressLint("WrongViewCast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-        val materialToolbar: MaterialToolbar = findViewById(R.id.title_search)
-        val clearButton = findViewById<ImageView>(R.id.search_clearIcon)
-        val searchEditText = findViewById<EditText>(R.id.search_bar)
-        val rvSearchResult = findViewById<RecyclerView>(R.id.rvSearchResult)
-        val searchIsEmpty = findViewById<LinearLayout>(R.id.search_is_empty)
-        val searchNoInternet = findViewById<LinearLayout>(R.id.search_no_internet)
-        val btSearchUpdate = findViewById<Button>(R.id.bt_search_update)
+        materialToolbar = findViewById(R.id.title_search)
+        clearButton = findViewById<ImageView>(R.id.search_clearIcon)
+        searchEditText = findViewById<EditText>(R.id.search_bar)
+        rvSearchResult = findViewById<RecyclerView>(R.id.rv_search_result)
+        rvSearchHistory = findViewById<RecyclerView>(R.id.rv_search_history)
+        btSearchUpdate = findViewById<Button>(R.id.bt_search_update)
+        btClearHistory = findViewById<Button>(R.id.bt_clear_history)
+        llSearchIsEmpty = findViewById<LinearLayout>(R.id.search_is_empty)
+        llSearchNoInternet = findViewById<LinearLayout>(R.id.search_no_internet)
+        llSearchHistory = findViewById<LinearLayout>(R.id.ll_search_history)
+        val sharedPrefs = getSharedPreferences(SHARED_PREFERENСES, MODE_PRIVATE)
+        searchHistory = SearchHistory(sharedPrefs)
+        loadSearchHistory()
+
+        adapter = TrackAdapter(tracks) { clickedTrack ->
+            searchHistory.push(clickedTrack)
+            loadSearchHistory()
+        }
 
         rvSearchResult.adapter = adapter
+        rvSearchHistory.adapter = adapterHistory
+
+        if (searchEditText.text.isEmpty()) {
+            if (tracksHistory.isNotEmpty()) {
+                showHistory()
+            } else {
+                llSearchHistory.visibility = View.GONE
+            }
+        }
 
         materialToolbar.setNavigationOnClickListener {
             finish()
@@ -57,6 +96,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                llSearchHistory.visibility = if (searchEditText.hasFocus()) View.GONE else View.VISIBLE
                 clearButton.visibility = clearButtonVisability(s)
             }
 
@@ -75,38 +115,20 @@ class SearchActivity : AppCompatActivity() {
                             call: Call<TrackResponse?>,
                             response: Response<TrackResponse?>
                         ) {
-                            if (response.code() == 200) {
-                                tracks.clear()
-                                searchNoInternet.visibility = View.GONE
-                                searchIsEmpty.visibility = View.GONE
-                                if (response.body()?.results?.isNotEmpty() == true) {
-                                    tracks.addAll(response.body()?.results!!)
-                                    adapter.notifyDataSetChanged()
-                                } else {
-                                    tracks.clear()
-                                    adapter.notifyDataSetChanged()
-                                    searchNoInternet.visibility = View.GONE
-                                    searchIsEmpty.visibility = View.VISIBLE
-                                }
-                            } else {
-                                tracks.clear()
-                                adapter.notifyDataSetChanged()
-                                searchIsEmpty.visibility = View.GONE
-                                searchNoInternet.visibility = View.VISIBLE
-                            }
+                            handleSearchResponse(response)
                         }
 
                         override fun onFailure(call: Call<TrackResponse?>, t: Throwable) {
-                            tracks.clear()
-                            adapter.notifyDataSetChanged()
-                            searchIsEmpty.visibility = View.GONE
-                            searchNoInternet.visibility = View.VISIBLE
+                            handleSearchFailure()
                         }
                     })
                 }
                 true
             }
             false
+        }
+        searchEditText.setOnFocusChangeListener { view, hasFocus ->
+            llSearchHistory.visibility = if (hasFocus) View.GONE else View.VISIBLE
         }
         btSearchUpdate.setOnClickListener {
             val retryCall = lastCall?.clone()
@@ -117,32 +139,11 @@ class SearchActivity : AppCompatActivity() {
                     call: Call<TrackResponse?>,
                     response: Response<TrackResponse?>
                 ) {
-                    if (response.code() == 200) {
-                        tracks.clear()
-                        searchNoInternet.visibility = View.GONE
-                        searchIsEmpty.visibility = View.GONE
-                        if (response.body()?.results?.isNotEmpty() == true) {
-                            tracks.addAll(response.body()?.results!!)
-                            adapter.notifyDataSetChanged()
-                        } else {
-                            tracks.clear()
-                            adapter.notifyDataSetChanged()
-                            searchNoInternet.visibility = View.GONE
-                            searchIsEmpty.visibility = View.VISIBLE
-                        }
-                    } else {
-                        tracks.clear()
-                        adapter.notifyDataSetChanged()
-                        searchIsEmpty.visibility = View.GONE
-                        searchNoInternet.visibility = View.VISIBLE
-                    }
+                    handleSearchResponse(response)
                 }
 
                 override fun onFailure(call: Call<TrackResponse?>, t: Throwable) {
-                    tracks.clear()
-                    adapter.notifyDataSetChanged()
-                    searchIsEmpty.visibility = View.GONE
-                    searchNoInternet.visibility = View.VISIBLE
+                    handleSearchFailure()
                 }
             })
         }
@@ -150,13 +151,17 @@ class SearchActivity : AppCompatActivity() {
         clearButton.setOnClickListener {
             searchEditText.setText("")
             searchEditText.clearFocus()
-            tracks.clear()
-            adapter.notifyDataSetChanged()
-            searchNoInternet.visibility = View.GONE
-            searchIsEmpty.visibility = View.GONE
+            showHistory()
             val imm =
                 it.context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
+        }
+
+        btClearHistory.setOnClickListener {
+            searchHistory.clear()
+            tracksHistory.clear()
+            adapterHistory.notifyDataSetChanged()
+            llSearchHistory.visibility = View.GONE
         }
     }
 
@@ -169,12 +174,7 @@ class SearchActivity : AppCompatActivity() {
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         editTextSaver = savedInstanceState.getString(EDIT_TEXT, TEXT_DEF)
-        searchEditText?.setText(editTextSaver)
-    }
-
-    companion object {
-        const val EDIT_TEXT = "EDIT_TEXT"
-        const val TEXT_DEF = ""
+        searchEditText.setText(editTextSaver)
     }
 
     private fun clearButtonVisability(s: CharSequence?): Int {
@@ -183,5 +183,66 @@ class SearchActivity : AppCompatActivity() {
         } else {
             View.VISIBLE
         }
+    }
+
+    private fun handleSearchResponse(response: Response<TrackResponse?>) {
+        if (response.isSuccessful) { // response.code() in 200..299
+            val results = response.body()?.results
+            if (!results.isNullOrEmpty()) {
+                tracks.clear()
+                tracks.addAll(results)
+                adapter.notifyDataSetChanged()
+                showContent()
+            } else {
+                showEmptyResults()
+            }
+        } else {
+            showNetworkError()
+        }
+    }
+
+    private fun handleSearchFailure() {
+        showNetworkError()
+    }
+
+    private fun showContent() {
+        llSearchHistory.visibility = View.GONE
+        rvSearchResult.visibility = View.VISIBLE
+        llSearchIsEmpty.visibility = View.GONE
+        llSearchNoInternet.visibility = View.GONE
+    }
+
+    private fun showEmptyResults() {
+        tracks.clear()
+        adapter.notifyDataSetChanged()
+        llSearchHistory.visibility = View.GONE
+        rvSearchResult.visibility = View.GONE
+        llSearchIsEmpty.visibility = View.VISIBLE
+        llSearchNoInternet.visibility = View.GONE
+    }
+
+    private fun showNetworkError() {
+        tracks.clear()
+        adapter.notifyDataSetChanged()
+        llSearchHistory.visibility = View.GONE
+        rvSearchResult.visibility = View.GONE
+        llSearchIsEmpty.visibility = View.GONE
+        llSearchNoInternet.visibility = View.VISIBLE
+    }
+    private fun showHistory() {
+        tracks.clear()
+        adapter.notifyDataSetChanged()
+        loadSearchHistory()
+        rvSearchResult.visibility = View.GONE
+        llSearchIsEmpty.visibility = View.GONE
+        llSearchNoInternet.visibility = View.GONE
+    }
+
+    private fun loadSearchHistory() {
+        val saved = searchHistory.get()
+        tracksHistory.clear()
+        tracksHistory.addAll(saved)
+        adapterHistory.notifyDataSetChanged()
+        llSearchHistory.visibility = if (tracksHistory.isNotEmpty()) View.VISIBLE else View.GONE
     }
 }
