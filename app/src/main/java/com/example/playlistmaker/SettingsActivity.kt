@@ -13,7 +13,7 @@ class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
-        val materialToolbar : MaterialToolbar = findViewById(R.id.title_settings)
+        val materialToolbar : MaterialToolbar = findViewById(R.id.mtb_arrowback)
         materialToolbar.setNavigationOnClickListener {
             finish()
         }

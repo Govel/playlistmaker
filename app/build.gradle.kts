@@ -1,16 +1,16 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-parcelize")
 }
 
 android {
     namespace = "com.example.playlistmaker"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.playlistmaker"
         minSdk = 29
-        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
