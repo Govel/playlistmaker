@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/main">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/title_search"
@@ -63,15 +63,14 @@
         android:orientation="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-
     <LinearLayout
         android:id="@+id/search_is_empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="vertical"
-        android:paddingTop="100dp"
-        android:visibility="gone">
+        android:visibility="gone"
+        android:paddingTop="100dp">
 
         <ImageView
             android:layout_width="120dp"
@@ -96,8 +95,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingTop="100dp"
-        android:visibility="gone">
+        android:visibility="gone"
+        android:paddingTop="100dp">
 
         <ImageView
             android:layout_width="120dp"
@@ -108,59 +107,55 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:layout_marginTop="20dp"
             android:fontFamily="@font/ys_display_medium"
-            android:gravity="center"
             android:text="@string/search_no_internet"
             android:textColor="@color/colorOnPrimary"
             android:textSize="@dimen/large_text_size" />
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:layout_marginTop="20dp"
             android:fontFamily="@font/ys_display_medium"
-            android:gravity="center"
             android:text="@string/search_no_internet_load"
             android:textColor="@color/colorOnPrimary"
             android:textSize="@dimen/large_text_size" />
-
         <Button
             android:id="@+id/bt_search_update"
             android:layout_width="100dp"
             android:layout_height="50dp"
-            android:layout_gravity="center"
             android:layout_marginTop="24dp"
-            android:backgroundTint="@color/bt_bg_color_variant"
-            android:fontFamily="@font/ys_display_medium"
-            android:letterSpacing="0"
             android:text="@string/search_update"
-            android:textAllCaps="false"
-            android:textColor="@color/bt_txt_color_variant"
+            android:fontFamily="@font/ys_display_medium"
             android:textFontWeight="500"
             android:textSize="14sp"
-            app:cornerRadius="54dp" />
+            android:textColor="@color/bt_txt_color_variant"
+            android:backgroundTint="@color/bt_bg_color_variant"
+            android:textAllCaps="false"
+            android:layout_gravity="center"
+            app:cornerRadius="54dp"
+            android:letterSpacing="0"
+            />
 
     </LinearLayout>
-
     <LinearLayout
         android:id="@+id/ll_search_history"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:paddingBottom="24dp"
+        android:orientation="vertical"
         android:visibility="gone">
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:fontFamily="@font/ys_display_medium"
-            android:gravity="center"
             android:text="@string/search_history"
-            android:textColor="@color/colorOnPrimary"
+            android:gravity="center"
+            android:fontFamily="@font/ys_display_medium"
+            android:textSize="@dimen/large_text_size"
             android:textFontWeight="500"
-            android:textSize="@dimen/large_text_size" />
-
+            android:textColor="@color/colorOnPrimary" />
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_search_history"
             android:layout_width="match_parent"
@@ -168,21 +163,20 @@
             android:orientation="vertical"
             android:paddingTop="8dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
         <Button
             android:id="@+id/bt_clear_history"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_gravity="center"
-            android:backgroundTint="@color/bt_bg_color_variant"
-            android:fontFamily="@font/ys_display_medium"
-            android:letterSpacing="0"
             android:text="@string/search_clear_history"
-            android:textAllCaps="false"
-            android:textColor="@color/bt_txt_color_variant"
+            android:fontFamily="@font/ys_display_medium"
             android:textFontWeight="500"
             android:textSize="14sp"
-            app:cornerRadius="54dp" />
+            android:textColor="@color/bt_txt_color_variant"
+            android:backgroundTint="@color/bt_bg_color_variant"
+            android:textAllCaps="false"
+            app:cornerRadius="54dp"
+            android:letterSpacing="0"/>
 
     </LinearLayout>
 </LinearLayout>

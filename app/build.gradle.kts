@@ -12,8 +12,8 @@ android {
         applicationId = "com.example.playlistmaker"
         minSdk = 29
         versionCode = 1
+        targetSdk = 36
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
