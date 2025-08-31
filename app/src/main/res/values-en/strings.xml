@@ -16,9 +16,4 @@
     <string name="search_update">Update</string>
     <string name="search_history">Search History</string>
     <string name="search_clear_history">Clean history</string>
-    <string name="duration">Duration</string>
-    <string name="collection_name">Album</string>
-    <string name="release_date">Year</string>
-    <string name="primary_genre_name">Genre</string>
-    <string name="country">Country</string>
 </resources>
