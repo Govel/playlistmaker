@@ -1,10 +1,10 @@
 package com.example.playlistmaker
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -12,6 +12,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import retrofit2.Call
@@ -35,7 +36,10 @@ class SearchActivity : AppCompatActivity() {
         searchHistory.push(clickedTrack)
         loadSearchHistory()
     }
-    private val adapterHistory = HistoryTrackAdapter(tracksHistory)
+    private var adapterHistory = TrackAdapter(tracks) { clickedTrack ->
+        searchHistory.push(clickedTrack)
+        loadSearchHistory()
+    }
     private var lastCall: Call<TrackResponse>? = null
     private lateinit var materialToolbar: MaterialToolbar
     private lateinit var searchEditText: EditText
@@ -75,8 +79,19 @@ class SearchActivity : AppCompatActivity() {
         adapter = TrackAdapter(tracks) { clickedTrack ->
             searchHistory.push(clickedTrack)
             loadSearchHistory()
+            val displayAudioPlayer = Intent(this, AudioPlayer::class.java)
+            displayAudioPlayer.putExtra(TAG_CURRENT_TRACK, clickedTrack)
+            startActivity(displayAudioPlayer)
         }
 
+
+        adapterHistory = TrackAdapter(tracksHistory) { clickedTrack ->
+            searchHistory.push(clickedTrack)
+            loadSearchHistory()
+            val displayAudioPlayer = Intent(this, AudioPlayer::class.java)
+            displayAudioPlayer.putExtra(TAG_CURRENT_TRACK, clickedTrack)
+            startActivity(displayAudioPlayer)
+        }
         rvSearchResult.adapter = adapter
         rvSearchHistory.adapter = adapterHistory
 
@@ -84,7 +99,7 @@ class SearchActivity : AppCompatActivity() {
             if (tracksHistory.isNotEmpty()) {
                 showHistory()
             } else {
-                llSearchHistory.visibility = View.GONE
+                llSearchHistory.isVisible = false
             }
         }
 
@@ -96,8 +111,8 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                llSearchHistory.visibility = if (searchEditText.hasFocus()) View.GONE else View.VISIBLE
-                clearButton.visibility = clearButtonVisability(s)
+                llSearchHistory.isVisible = !searchEditText.hasFocus()
+                clearButton.isVisible = clearButtonVisability(s)
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -128,7 +143,7 @@ class SearchActivity : AppCompatActivity() {
             false
         }
         searchEditText.setOnFocusChangeListener { view, hasFocus ->
-            llSearchHistory.visibility = if (hasFocus) View.GONE else View.VISIBLE
+            llSearchHistory.isVisible = !hasFocus
         }
         btSearchUpdate.setOnClickListener {
             val retryCall = lastCall?.clone()
@@ -161,7 +176,7 @@ class SearchActivity : AppCompatActivity() {
             searchHistory.clear()
             tracksHistory.clear()
             adapterHistory.notifyDataSetChanged()
-            llSearchHistory.visibility = View.GONE
+            llSearchHistory.isVisible = false
         }
     }
 
@@ -177,12 +192,8 @@ class SearchActivity : AppCompatActivity() {
         searchEditText.setText(editTextSaver)
     }
 
-    private fun clearButtonVisability(s: CharSequence?): Int {
-        return if (s.isNullOrEmpty()) {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
+    private fun clearButtonVisability(s: CharSequence?): Boolean {
+        return if (s.isNullOrEmpty()) false else true
     }
 
     private fun handleSearchResponse(response: Response<TrackResponse?>) {
@@ -206,36 +217,36 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showContent() {
-        llSearchHistory.visibility = View.GONE
-        rvSearchResult.visibility = View.VISIBLE
-        llSearchIsEmpty.visibility = View.GONE
-        llSearchNoInternet.visibility = View.GONE
+        llSearchHistory.isVisible = false
+        rvSearchResult.isVisible = true
+        llSearchIsEmpty.isVisible = false
+        llSearchNoInternet.isVisible = false
     }
 
     private fun showEmptyResults() {
         tracks.clear()
         adapter.notifyDataSetChanged()
-        llSearchHistory.visibility = View.GONE
-        rvSearchResult.visibility = View.GONE
-        llSearchIsEmpty.visibility = View.VISIBLE
-        llSearchNoInternet.visibility = View.GONE
+        llSearchHistory.isVisible = false
+        rvSearchResult.isVisible = false
+        llSearchIsEmpty.isVisible = true
+        llSearchNoInternet.isVisible = false
     }
 
     private fun showNetworkError() {
         tracks.clear()
         adapter.notifyDataSetChanged()
-        llSearchHistory.visibility = View.GONE
-        rvSearchResult.visibility = View.GONE
-        llSearchIsEmpty.visibility = View.GONE
-        llSearchNoInternet.visibility = View.VISIBLE
+        llSearchHistory.isVisible = false
+        rvSearchResult.isVisible = false
+        llSearchIsEmpty.isVisible = false
+        llSearchNoInternet.isVisible = true
     }
     private fun showHistory() {
         tracks.clear()
         adapter.notifyDataSetChanged()
         loadSearchHistory()
-        rvSearchResult.visibility = View.GONE
-        llSearchIsEmpty.visibility = View.GONE
-        llSearchNoInternet.visibility = View.GONE
+        rvSearchResult.isVisible = false
+        llSearchIsEmpty.isVisible = false
+        llSearchNoInternet.isVisible = false
     }
 
     private fun loadSearchHistory() {
@@ -243,6 +254,6 @@ class SearchActivity : AppCompatActivity() {
         tracksHistory.clear()
         tracksHistory.addAll(saved)
         adapterHistory.notifyDataSetChanged()
-        llSearchHistory.visibility = if (tracksHistory.isNotEmpty()) View.VISIBLE else View.GONE
+        llSearchHistory.isVisible = tracksHistory.isNotEmpty()
     }
 }
