@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -36,7 +37,10 @@ class SearchActivity : AppCompatActivity() {
         searchHistory.push(clickedTrack)
         loadSearchHistory()
     }
-    private val adapterHistory = HistoryTrackAdapter(tracksHistory)
+    private var adapterHistory = TrackAdapter(tracks) { clickedTrack ->
+        searchHistory.push(clickedTrack)
+        loadSearchHistory()
+    }
     private var lastCall: Call<TrackResponse>? = null
     private lateinit var materialToolbar: MaterialToolbar
     private lateinit var searchEditText: EditText
@@ -81,6 +85,14 @@ class SearchActivity : AppCompatActivity() {
             startActivity(displayAudioPlayer)
         }
 
+
+        adapterHistory = TrackAdapter(tracksHistory) { clickedTrack ->
+            searchHistory.push(clickedTrack)
+            loadSearchHistory()
+            val displayAudioPlayer = Intent(this, AudioPlayer::class.java)
+            displayAudioPlayer.putExtra(TAG_CURRENT_TRACK, clickedTrack)
+            startActivity(displayAudioPlayer)
+        }
         rvSearchResult.adapter = adapter
         rvSearchHistory.adapter = adapterHistory
 
