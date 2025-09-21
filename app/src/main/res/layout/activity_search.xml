@@ -159,7 +159,8 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_search_history"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:orientation="vertical"
             android:paddingTop="8dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
@@ -177,6 +178,5 @@
             android:textAllCaps="false"
             app:cornerRadius="54dp"
             android:letterSpacing="0"/>
-
     </LinearLayout>
 </LinearLayout>

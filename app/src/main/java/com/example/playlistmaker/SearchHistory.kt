@@ -28,7 +28,7 @@ class SearchHistory(
     }
     fun push(track: Track) {
         val list = get()
-        list.removeAll { it.trackName == track.trackName }
+        list.removeAll { it.trackId == track.trackId }
         list.add(0, track)
         if (list.size > MAX_SIZE) {
             list.removeAt(list.size - 1)

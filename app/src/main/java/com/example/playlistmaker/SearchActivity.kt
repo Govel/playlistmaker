@@ -3,6 +3,8 @@ package com.example.playlistmaker
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.inputmethod.EditorInfo
@@ -52,10 +54,13 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var llSearchNoInternet: LinearLayout
     private lateinit var llSearchHistory: LinearLayout
     private lateinit var searchHistory: SearchHistory
+    private val handler = Handler(Looper.getMainLooper())
+    private val searchRunnable = Runnable { searchRequest() }
     companion object {
         private const val SHARED_PREFERENСES = "shared_prefs"
         const val EDIT_TEXT = "EDIT_TEXT"
         const val TEXT_DEF = ""
+        const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
 
     @SuppressLint("WrongViewCast")
@@ -113,6 +118,7 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 llSearchHistory.isVisible = !searchEditText.hasFocus()
                 clearButton.isVisible = clearButtonVisability(s)
+                searchDebounce()
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -122,22 +128,7 @@ class SearchActivity : AppCompatActivity() {
         searchEditText.addTextChangedListener(searchTextWatcher)
         searchEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                if (searchEditText.text.isNotEmpty()) {
-                    lastCall = iTunesService.search(searchEditText.text.toString())
-                    lastCall?.enqueue(object : Callback<TrackResponse> {
-                        @SuppressLint("NotifyDataSetChanged")
-                        override fun onResponse(
-                            call: Call<TrackResponse?>,
-                            response: Response<TrackResponse?>
-                        ) {
-                            handleSearchResponse(response)
-                        }
-
-                        override fun onFailure(call: Call<TrackResponse?>, t: Throwable) {
-                            handleSearchFailure()
-                        }
-                    })
-                }
+                searchRequest()
                 true
             }
             false
@@ -196,6 +187,28 @@ class SearchActivity : AppCompatActivity() {
         return if (s.isNullOrEmpty()) false else true
     }
 
+    private fun searchRequest() {
+        if (searchEditText.text.isNotEmpty()) {
+            lastCall = iTunesService.search(searchEditText.text.toString())
+            lastCall?.enqueue(object : Callback<TrackResponse> {
+                @SuppressLint("NotifyDataSetChanged")
+                override fun onResponse(
+                    call: Call<TrackResponse?>,
+                    response: Response<TrackResponse?>
+                ) {
+                    handleSearchResponse(response)
+                }
+
+                override fun onFailure(call: Call<TrackResponse?>, t: Throwable) {
+                    handleSearchFailure()
+                }
+            })
+        }
+    }
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+    }
     private fun handleSearchResponse(response: Response<TrackResponse?>) {
         if (response.isSuccessful) { // response.code() in 200..299
             val results = response.body()?.results
