@@ -61,6 +61,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:visibility="gone"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     <LinearLayout
@@ -179,4 +180,20 @@
             app:cornerRadius="54dp"
             android:letterSpacing="0"/>
     </LinearLayout>
+    <FrameLayout
+        android:id="@+id/pb_search"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="gone">
+        <ProgressBar
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="140dp"
+            android:indeterminateTint="@color/yp_blue"
+            android:layout_gravity="center|top" />
+
+    </FrameLayout>
+        
+        
 </LinearLayout>

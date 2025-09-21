@@ -24,5 +24,6 @@ class TrackAdapter (
         holder.itemView.setOnClickListener {
             onItemClick(track)
         }
+
     }
 }
