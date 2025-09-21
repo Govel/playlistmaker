@@ -14,8 +14,9 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
@@ -74,6 +75,20 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val bottomPadding = if (ime.bottom > 0) {
+                ime.bottom
+            } else {
+                systemBars.bottom
+            }
+            v.setPadding(
+                systemBars.left, systemBars.top, systemBars.right,
+                bottomPadding
+            )
+            insets
+        }
         materialToolbar = findViewById(R.id.title_search)
         clearButton = findViewById<ImageView>(R.id.search_clearIcon)
         searchEditText = findViewById<EditText>(R.id.search_bar)
