@@ -219,7 +219,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun searchRequest() {
         if (searchEditText.text.isNotEmpty()) {
-            pbSearch.isVisible = true
+            showProgressBar()
             lastCall = iTunesService.search(searchEditText.text.toString())
             lastCall?.enqueue(object : Callback<TrackResponse> {
                 @SuppressLint("NotifyDataSetChanged")
@@ -227,12 +227,11 @@ class SearchActivity : AppCompatActivity() {
                     call: Call<TrackResponse?>,
                     response: Response<TrackResponse?>
                 ) {
-                    pbSearch.isVisible = false
                     handleSearchResponse(response)
                 }
 
                 override fun onFailure(call: Call<TrackResponse?>, t: Throwable) {
-                    pbSearch.isVisible = true
+                    showProgressBar()
                     handleSearchFailure()
                 }
             })
@@ -275,6 +274,7 @@ class SearchActivity : AppCompatActivity() {
         rvSearchResult.isVisible = true
         llSearchIsEmpty.isVisible = false
         llSearchNoInternet.isVisible = false
+        pbSearch.isVisible = false
     }
 
     private fun showEmptyResults() {
@@ -284,6 +284,7 @@ class SearchActivity : AppCompatActivity() {
         rvSearchResult.isVisible = false
         llSearchIsEmpty.isVisible = true
         llSearchNoInternet.isVisible = false
+        pbSearch.isVisible = false
     }
 
     private fun showNetworkError() {
@@ -293,6 +294,7 @@ class SearchActivity : AppCompatActivity() {
         rvSearchResult.isVisible = false
         llSearchIsEmpty.isVisible = false
         llSearchNoInternet.isVisible = true
+        pbSearch.isVisible = false
     }
     private fun showHistory() {
         tracks.clear()
@@ -301,6 +303,16 @@ class SearchActivity : AppCompatActivity() {
         rvSearchResult.isVisible = false
         llSearchIsEmpty.isVisible = false
         llSearchNoInternet.isVisible = false
+        pbSearch.isVisible = false
+    }
+    private fun showProgressBar() {
+        tracks.clear()
+        adapter.notifyDataSetChanged()
+        llSearchHistory.isVisible = false
+        rvSearchResult.isVisible = false
+        llSearchIsEmpty.isVisible = false
+        llSearchNoInternet.isVisible = false
+        pbSearch.isVisible = true
     }
 
     private fun loadSearchHistory() {
