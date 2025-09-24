@@ -3,15 +3,20 @@ package com.example.playlistmaker
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
@@ -37,8 +42,10 @@ class SearchActivity : AppCompatActivity() {
         loadSearchHistory()
     }
     private var adapterHistory = TrackAdapter(tracks) { clickedTrack ->
-        searchHistory.push(clickedTrack)
-        loadSearchHistory()
+        if (clickDebounce()) {
+            searchHistory.push(clickedTrack)
+            loadSearchHistory()
+        }
     }
     private var lastCall: Call<TrackResponse>? = null
     private lateinit var materialToolbar: MaterialToolbar
@@ -52,16 +59,36 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var llSearchNoInternet: LinearLayout
     private lateinit var llSearchHistory: LinearLayout
     private lateinit var searchHistory: SearchHistory
+    private lateinit var pbSearch: FrameLayout
+    private val handler = Handler(Looper.getMainLooper())
+    private val searchRunnable = Runnable { searchRequest() }
+    private var isClickAllowed = true
     companion object {
         private const val SHARED_PREFERENСES = "shared_prefs"
         const val EDIT_TEXT = "EDIT_TEXT"
         const val TEXT_DEF = ""
+        const val SEARCH_DEBOUNCE_DELAY = 2000L
+        const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 
     @SuppressLint("WrongViewCast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val bottomPadding = if (ime.bottom > 0) {
+                ime.bottom
+            } else {
+                systemBars.bottom
+            }
+            v.setPadding(
+                systemBars.left, systemBars.top, systemBars.right,
+                bottomPadding
+            )
+            insets
+        }
         materialToolbar = findViewById(R.id.title_search)
         clearButton = findViewById<ImageView>(R.id.search_clearIcon)
         searchEditText = findViewById<EditText>(R.id.search_bar)
@@ -72,25 +99,29 @@ class SearchActivity : AppCompatActivity() {
         llSearchIsEmpty = findViewById<LinearLayout>(R.id.search_is_empty)
         llSearchNoInternet = findViewById<LinearLayout>(R.id.search_no_internet)
         llSearchHistory = findViewById<LinearLayout>(R.id.ll_search_history)
+        pbSearch = findViewById<FrameLayout>(R.id.pb_search)
         val sharedPrefs = getSharedPreferences(SHARED_PREFERENСES, MODE_PRIVATE)
         searchHistory = SearchHistory(sharedPrefs)
         loadSearchHistory()
 
         adapter = TrackAdapter(tracks) { clickedTrack ->
-            searchHistory.push(clickedTrack)
-            loadSearchHistory()
-            val displayAudioPlayer = Intent(this, AudioPlayer::class.java)
-            displayAudioPlayer.putExtra(TAG_CURRENT_TRACK, clickedTrack)
-            startActivity(displayAudioPlayer)
+            if (clickDebounce()) {
+                searchHistory.push(clickedTrack)
+                loadSearchHistory()
+                val displayAudioPlayer = Intent(this, AudioPlayer::class.java)
+                displayAudioPlayer.putExtra(TAG_CURRENT_TRACK, clickedTrack)
+                startActivity(displayAudioPlayer)
+            }
         }
 
-
         adapterHistory = TrackAdapter(tracksHistory) { clickedTrack ->
-            searchHistory.push(clickedTrack)
-            loadSearchHistory()
-            val displayAudioPlayer = Intent(this, AudioPlayer::class.java)
-            displayAudioPlayer.putExtra(TAG_CURRENT_TRACK, clickedTrack)
-            startActivity(displayAudioPlayer)
+            if (clickDebounce()) {
+                searchHistory.push(clickedTrack)
+                loadSearchHistory()
+                val displayAudioPlayer = Intent(this, AudioPlayer::class.java)
+                displayAudioPlayer.putExtra(TAG_CURRENT_TRACK, clickedTrack)
+                startActivity(displayAudioPlayer)
+            }
         }
         rvSearchResult.adapter = adapter
         rvSearchHistory.adapter = adapterHistory
@@ -113,6 +144,7 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 llSearchHistory.isVisible = !searchEditText.hasFocus()
                 clearButton.isVisible = clearButtonVisability(s)
+                searchDebounce()
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -122,22 +154,7 @@ class SearchActivity : AppCompatActivity() {
         searchEditText.addTextChangedListener(searchTextWatcher)
         searchEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                if (searchEditText.text.isNotEmpty()) {
-                    lastCall = iTunesService.search(searchEditText.text.toString())
-                    lastCall?.enqueue(object : Callback<TrackResponse> {
-                        @SuppressLint("NotifyDataSetChanged")
-                        override fun onResponse(
-                            call: Call<TrackResponse?>,
-                            response: Response<TrackResponse?>
-                        ) {
-                            handleSearchResponse(response)
-                        }
-
-                        override fun onFailure(call: Call<TrackResponse?>, t: Throwable) {
-                            handleSearchFailure()
-                        }
-                    })
-                }
+                searchRequest()
                 true
             }
             false
@@ -147,6 +164,8 @@ class SearchActivity : AppCompatActivity() {
         }
         btSearchUpdate.setOnClickListener {
             val retryCall = lastCall?.clone()
+            llSearchNoInternet.isVisible = false
+            pbSearch.isVisible = true
             lastCall = retryCall
             retryCall?.enqueue(object : Callback<TrackResponse> {
                 @SuppressLint("NotifyDataSetChanged")
@@ -154,10 +173,12 @@ class SearchActivity : AppCompatActivity() {
                     call: Call<TrackResponse?>,
                     response: Response<TrackResponse?>
                 ) {
+                    pbSearch.isVisible = false
                     handleSearchResponse(response)
                 }
 
                 override fun onFailure(call: Call<TrackResponse?>, t: Throwable) {
+                    pbSearch.isVisible = false
                     handleSearchFailure()
                 }
             })
@@ -196,6 +217,38 @@ class SearchActivity : AppCompatActivity() {
         return if (s.isNullOrEmpty()) false else true
     }
 
+    private fun searchRequest() {
+        if (searchEditText.text.isNotEmpty()) {
+            showProgressBar()
+            lastCall = iTunesService.search(searchEditText.text.toString())
+            lastCall?.enqueue(object : Callback<TrackResponse> {
+                @SuppressLint("NotifyDataSetChanged")
+                override fun onResponse(
+                    call: Call<TrackResponse?>,
+                    response: Response<TrackResponse?>
+                ) {
+                    handleSearchResponse(response)
+                }
+
+                override fun onFailure(call: Call<TrackResponse?>, t: Throwable) {
+                    showProgressBar()
+                    handleSearchFailure()
+                }
+            })
+        }
+    }
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+    }
+    private fun clickDebounce() : Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
     private fun handleSearchResponse(response: Response<TrackResponse?>) {
         if (response.isSuccessful) { // response.code() in 200..299
             val results = response.body()?.results
@@ -221,6 +274,7 @@ class SearchActivity : AppCompatActivity() {
         rvSearchResult.isVisible = true
         llSearchIsEmpty.isVisible = false
         llSearchNoInternet.isVisible = false
+        pbSearch.isVisible = false
     }
 
     private fun showEmptyResults() {
@@ -230,6 +284,7 @@ class SearchActivity : AppCompatActivity() {
         rvSearchResult.isVisible = false
         llSearchIsEmpty.isVisible = true
         llSearchNoInternet.isVisible = false
+        pbSearch.isVisible = false
     }
 
     private fun showNetworkError() {
@@ -239,6 +294,7 @@ class SearchActivity : AppCompatActivity() {
         rvSearchResult.isVisible = false
         llSearchIsEmpty.isVisible = false
         llSearchNoInternet.isVisible = true
+        pbSearch.isVisible = false
     }
     private fun showHistory() {
         tracks.clear()
@@ -247,6 +303,16 @@ class SearchActivity : AppCompatActivity() {
         rvSearchResult.isVisible = false
         llSearchIsEmpty.isVisible = false
         llSearchNoInternet.isVisible = false
+        pbSearch.isVisible = false
+    }
+    private fun showProgressBar() {
+        tracks.clear()
+        adapter.notifyDataSetChanged()
+        llSearchHistory.isVisible = false
+        rvSearchResult.isVisible = false
+        llSearchIsEmpty.isVisible = false
+        llSearchNoInternet.isVisible = false
+        pbSearch.isVisible = true
     }
 
     private fun loadSearchHistory() {

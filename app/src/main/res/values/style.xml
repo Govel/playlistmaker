@@ -32,6 +32,7 @@
         <item name="iconPadding">@dimen/icon_padding</item>
         <item name="cornerRadius">@dimen/button_corner_radius</item>
         <item name="iconGravity">textStart</item>
+        <item name="android:layout_marginHorizontal">16dp</item>
     </style>
 
     <style name="TrackInfoApi">

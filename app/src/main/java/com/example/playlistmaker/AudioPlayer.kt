@@ -1,12 +1,19 @@
 package com.example.playlistmaker
 
+import android.annotation.SuppressLint
+import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.Group
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -14,6 +21,15 @@ import com.google.android.material.appbar.MaterialToolbar
 
 class AudioPlayer : AppCompatActivity() {
 
+    companion object {
+        private const val STATE_DEFAULT = 0
+        private const val STATE_PREPARED = 1
+        private const val STATE_PLAYING = 2
+        private const val STATE_PAUSED = 3
+    }
+    private var playerState = STATE_DEFAULT
+    private val handler = Handler(Looper.getMainLooper())
+    private var mediaPlayer = MediaPlayer()
     private lateinit var materialToolbar: MaterialToolbar
     private lateinit var ivArtwork: ImageView
     private lateinit var main: ConstraintLayout
@@ -30,10 +46,17 @@ class AudioPlayer : AppCompatActivity() {
     private lateinit var btAddToPlaylist: ImageView
     private lateinit var btPlay: ImageView
     private lateinit var btAddFavorite: ImageView
+    private lateinit var currentTrack: Track
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_audioplayer)
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.start)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         materialToolbar = findViewById(R.id.mtb_arrowback)
         ivArtwork = findViewById(R.id.iv_artwork)
@@ -53,7 +76,7 @@ class AudioPlayer : AppCompatActivity() {
         btAddFavorite = findViewById(R.id.bt_add_favorite)
 
         materialToolbar.setNavigationOnClickListener { finish() }
-        val currentTrack =  (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        currentTrack = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra(TAG_CURRENT_TRACK, Track::class.java)
         } else {
             @Suppress("DEPRECATION")
@@ -77,7 +100,7 @@ class AudioPlayer : AppCompatActivity() {
         tvTrackName.text = currentTrack.trackName
         tvArtistName.text = currentTrack.artistName
         tvTrackTimeMillis.text = LocalUtils().dateFormat(currentTrack.trackTimeMillis)
-        tvTrackTime.text = LocalUtils().dateFormat(0L)
+        tvTrackTime.text = LocalUtils().dateFormat(mediaPlayer.currentPosition.toLong())
         if (currentTrack.collectionName.isNullOrEmpty()) {
             groupAlbum.isVisible = false
         } else {
@@ -92,6 +115,80 @@ class AudioPlayer : AppCompatActivity() {
         }
         tvPrimaryGenreTrackName.text = currentTrack.primaryGenreName ?: ""
         tvTrackCountry.text = currentTrack.country ?: ""
+
+        preparePlayer()
+        btPlay.setOnClickListener {
+            playbackControl()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        pausePlayer()
+    }
+
+    @SuppressLint("ImplicitSamInstance")
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer.release()
+        handler.removeCallbacks { runnable() }
+    }
+
+    private fun playbackControl() {
+        when(playerState) {
+            STATE_PLAYING -> {
+                pausePlayer()
+            }
+            STATE_PREPARED, STATE_PAUSED -> {
+                startPlayer()
+            }
+        }
+    }
+
+    @SuppressLint("ImplicitSamInstance")
+    private fun preparePlayer() {
+        mediaPlayer.setDataSource(currentTrack.previewUrl)
+        mediaPlayer.prepareAsync()
+        mediaPlayer.setOnPreparedListener {
+            btPlay.isEnabled = true
+            playerState = STATE_PREPARED
+        }
+        mediaPlayer.setOnCompletionListener {
+            btPlay.setImageResource(R.drawable.play)
+            playerState = STATE_PREPARED
+            handler.removeCallbacks { runnable() }
+            tvTrackTime.text = "00:00"
+        }
+    }
+
+    @SuppressLint("ImplicitSamInstance")
+    private fun startPlayer() {
+        mediaPlayer.start()
+        btPlay.setImageResource(R.drawable.pause)
+        playerState = STATE_PLAYING
+        handler.removeCallbacks { runnable() }
+        handler.post(runnable())
+
+    }
+
+    @SuppressLint("ImplicitSamInstance")
+    private fun pausePlayer() {
+        mediaPlayer.pause()
+        btPlay.setImageResource(R.drawable.play)
+        playerState = STATE_PAUSED
+        handler.removeCallbacks { runnable() }
+    }
+    private fun runnable() : Runnable {
+        return object : Runnable {
+            @SuppressLint("SimpleDateFormat")
+            override fun run() {
+                if (playerState == STATE_PLAYING) {
+                    tvTrackTime.text = LocalUtils().dateFormat(mediaPlayer.currentPosition.toLong() + 1)
+                    Log.d("MyTag", tvTrackTime.text.toString())
+                    handler.postDelayed(this, 400L)
+                }
+            }
+        }
     }
 
 }
