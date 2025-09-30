@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.tracks
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -19,6 +19,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker.ui.audioplayer.AudioPlayer
+import com.example.playlistmaker.data.network.ITunesApi
+import com.example.playlistmaker.R
+import com.example.playlistmaker.data.dto.TracksSearchResponse
+import com.example.playlistmaker.domain.models.TAG_CURRENT_TRACK
+import com.example.playlistmaker.domain.models.Track
 import com.google.android.material.appbar.MaterialToolbar
 import retrofit2.Call
 import retrofit2.Callback
@@ -47,7 +53,7 @@ class SearchActivity : AppCompatActivity() {
             loadSearchHistory()
         }
     }
-    private var lastCall: Call<TrackResponse>? = null
+    private var lastCall: Call<TracksSearchResponse>? = null
     private lateinit var materialToolbar: MaterialToolbar
     private lateinit var searchEditText: EditText
     private lateinit var clearButton: ImageView
@@ -167,17 +173,17 @@ class SearchActivity : AppCompatActivity() {
             llSearchNoInternet.isVisible = false
             pbSearch.isVisible = true
             lastCall = retryCall
-            retryCall?.enqueue(object : Callback<TrackResponse> {
+            retryCall?.enqueue(object : Callback<TracksSearchResponse> {
                 @SuppressLint("NotifyDataSetChanged")
                 override fun onResponse(
-                    call: Call<TrackResponse?>,
-                    response: Response<TrackResponse?>
+                    call: Call<TracksSearchResponse?>,
+                    response: Response<TracksSearchResponse?>
                 ) {
                     pbSearch.isVisible = false
                     handleSearchResponse(response)
                 }
 
-                override fun onFailure(call: Call<TrackResponse?>, t: Throwable) {
+                override fun onFailure(call: Call<TracksSearchResponse?>, t: Throwable) {
                     pbSearch.isVisible = false
                     handleSearchFailure()
                 }
@@ -220,17 +226,17 @@ class SearchActivity : AppCompatActivity() {
     private fun searchRequest() {
         if (searchEditText.text.isNotEmpty()) {
             showProgressBar()
-            lastCall = iTunesService.search(searchEditText.text.toString())
-            lastCall?.enqueue(object : Callback<TrackResponse> {
+            lastCall = iTunesService.searchTracks(searchEditText.text.toString())
+            lastCall?.enqueue(object : Callback<TracksSearchResponse> {
                 @SuppressLint("NotifyDataSetChanged")
                 override fun onResponse(
-                    call: Call<TrackResponse?>,
-                    response: Response<TrackResponse?>
+                    call: Call<TracksSearchResponse?>,
+                    response: Response<TracksSearchResponse?>
                 ) {
                     handleSearchResponse(response)
                 }
 
-                override fun onFailure(call: Call<TrackResponse?>, t: Throwable) {
+                override fun onFailure(call: Call<TracksSearchResponse?>, t: Throwable) {
                     showProgressBar()
                     handleSearchFailure()
                 }
@@ -249,7 +255,7 @@ class SearchActivity : AppCompatActivity() {
         }
         return current
     }
-    private fun handleSearchResponse(response: Response<TrackResponse?>) {
+    private fun handleSearchResponse(response: Response<TracksSearchResponse?>) {
         if (response.isSuccessful) { // response.code() in 200..299
             val results = response.body()?.results
             if (!results.isNullOrEmpty()) {

@@ -1,9 +1,9 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.presentation
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
-
+import com.example.playlistmaker.ui.tracks.SearchHistory
 
 
 const val THEME_SWITCH_KEY = "theme_switch_key"

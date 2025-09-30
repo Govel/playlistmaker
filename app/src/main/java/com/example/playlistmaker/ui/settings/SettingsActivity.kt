@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.settings
 
 import android.content.Intent
 import android.net.Uri
@@ -7,9 +7,12 @@ import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.playlistmaker.presentation.App
+import com.example.playlistmaker.R
+import com.example.playlistmaker.presentation.THEME_SWITCH_KEY
+import com.example.playlistmaker.ui.tracks.SearchHistory
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
-
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,7 +61,7 @@ class SettingsActivity : AppCompatActivity() {
         themeSwitcher.isChecked = isDarkTheme
         themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
             (applicationContext as App).switchTheme(checked)
-            val sharedPrefs = getSharedPreferences(SearchHistory.SHARED_PREFERENСES, MODE_PRIVATE)
+            val sharedPrefs = getSharedPreferences(SearchHistory.Companion.SHARED_PREFERENСES, MODE_PRIVATE)
             sharedPrefs.edit()
                 .putBoolean(THEME_SWITCH_KEY, checked)
                 .apply()
