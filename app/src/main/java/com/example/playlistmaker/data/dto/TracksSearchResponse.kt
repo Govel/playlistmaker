@@ -4,5 +4,5 @@ import com.example.playlistmaker.domain.models.Track
 
 data class TracksSearchResponse(
     val resultCount: Int,
-    val results: List<Track>
-) : Response()
+    val results: List<TrackDto>
+) : NetworkResponse()
