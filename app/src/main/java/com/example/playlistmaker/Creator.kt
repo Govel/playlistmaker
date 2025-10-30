@@ -10,10 +10,12 @@ import com.example.playlistmaker.data.storages.local.SharedPrefsHistoryTracks
 import com.example.playlistmaker.data.storages.local.SharedPrefsNightMode
 import com.example.playlistmaker.data.storages.network.RetrofitNetworkClient
 import com.example.playlistmaker.domain.impl.NightModeInteractorImpl
+import com.example.playlistmaker.domain.impl.SettingsInteractorImpl
 import com.example.playlistmaker.domain.repository.TracksInteractor
 import com.example.playlistmaker.domain.impl.TracksInteractorImpl
 import com.example.playlistmaker.domain.repository.HistoryRepository
 import com.example.playlistmaker.domain.repository.NightModeRepository
+import com.example.playlistmaker.domain.repository.SettingsInteractor
 import com.google.gson.Gson
 
 object Creator {
@@ -61,4 +63,7 @@ object Creator {
         return TracksInteractorImpl(getTracksRepositoryImpl(), getHistoryRepository(key))
     }
 
+    fun provideSettingsInteractor(context: Context): SettingsInteractor {
+        return SettingsInteractorImpl(context)
+    }
 }
