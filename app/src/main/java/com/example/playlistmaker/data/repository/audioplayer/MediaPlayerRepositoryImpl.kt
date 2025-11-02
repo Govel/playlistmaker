@@ -6,17 +6,13 @@ import com.example.playlistmaker.domain.repository.audioplayer.MediaPlayerReposi
 class MediaPlayerRepositoryImpl(
     private val mediaPlayer: MediaPlayer
 ) : MediaPlayerRepository {
-    private var playerState = STATE_DEFAULT
+    private var playerState = PlayerState.STATE_DEFAULT
 
     override fun playbackControl() {
-        when (playerState) {
-            STATE_PLAYING -> {
-                pausePlayer()
-            }
-
-            STATE_PREPARED, STATE_PAUSED -> {
-                startPlayer()
-            }
+        if (playerState == PlayerState.STATE_PLAYING) {
+            pausePlayer()
+        } else {
+            startPlayer()
         }
     }
 
@@ -24,21 +20,21 @@ class MediaPlayerRepositoryImpl(
         mediaPlayer.setDataSource(url)
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
-            playerState = STATE_PREPARED
+            playerState = PlayerState.STATE_PREPARED
         }
         mediaPlayer.setOnCompletionListener {
-            playerState = STATE_PREPARED
+            playerState = PlayerState.STATE_PREPARED
         }
     }
 
     override fun startPlayer() {
         mediaPlayer.start()
-        playerState = STATE_PLAYING
+        playerState = PlayerState.STATE_PLAYING
     }
 
     override fun pausePlayer() {
         mediaPlayer.pause()
-        playerState = STATE_PAUSED
+        playerState = PlayerState.STATE_PAUSED
     }
 
     override fun releasePlayer() {
@@ -50,17 +46,19 @@ class MediaPlayerRepositoryImpl(
     }
 
     override fun isStatePlayerPlaying(): Boolean {
-        return playerState == STATE_PLAYING
+        return playerState == PlayerState.STATE_PLAYING
     }
 
     override fun isStatePlayerPrepared(): Boolean {
-        return playerState == STATE_PREPARED
+        return playerState == PlayerState.STATE_PREPARED
     }
 
     companion object {
-        private const val STATE_DEFAULT = 0
-        private const val STATE_PREPARED = 1
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
+        enum class PlayerState {
+            STATE_DEFAULT,
+            STATE_PREPARED,
+            STATE_PLAYING,
+            STATE_PAUSED
+        }
     }
 }

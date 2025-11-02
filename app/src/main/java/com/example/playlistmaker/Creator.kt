@@ -13,14 +13,12 @@ import com.example.playlistmaker.data.storages.local.SharedPrefsNightMode
 import com.example.playlistmaker.data.storages.network.RetrofitNetworkClient
 import com.example.playlistmaker.domain.impl.audioplayer.MediaPlayerInteractorImpl
 import com.example.playlistmaker.domain.impl.settings.NightModeInteractorImpl
-import com.example.playlistmaker.domain.impl.settings.SettingsInteractorImpl
 import com.example.playlistmaker.domain.repository.tracks.TracksInteractor
 import com.example.playlistmaker.domain.impl.tracks.TracksInteractorImpl
 import com.example.playlistmaker.domain.repository.tracks.HistoryRepository
 import com.example.playlistmaker.domain.repository.audioplayer.MediaPlayerInteractor
 import com.example.playlistmaker.domain.repository.audioplayer.MediaPlayerRepository
 import com.example.playlistmaker.domain.repository.settings.NightModeRepository
-import com.example.playlistmaker.domain.repository.settings.SettingsInteractor
 import com.google.gson.Gson
 
 object Creator {
@@ -66,9 +64,6 @@ object Creator {
     }
     fun provideTracksInteractor(key: String): TracksInteractor {
         return TracksInteractorImpl(getTracksRepositoryImpl(), getHistoryRepository(key))
-    }
-    fun provideSettingsInteractor(context: Context): SettingsInteractor {
-        return SettingsInteractorImpl(context)
     }
     private fun getMediaPlayerRepository(): MediaPlayerRepository {
         return MediaPlayerRepositoryImpl(MediaPlayer())

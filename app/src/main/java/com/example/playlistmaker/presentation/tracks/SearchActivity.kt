@@ -132,6 +132,12 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 llSearchHistory.isVisible = !searchEditText.hasFocus()
                 clearButton.isVisible = clearButtonVisibility(s)
+
+                if (s?.isEmpty() == false) {
+                    searchDebounce()
+                } else {
+                    stopCurrentRunnable()
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -167,6 +173,11 @@ class SearchActivity : AppCompatActivity() {
             adapterHistory.notifyDataSetChanged()
             llSearchHistory.isVisible = false
         }
+    }
+
+    private fun searchDebounce() {
+        stopCurrentRunnable()
+        handler.postDelayed(searchRequestRunnable, SEARCH_DEBOUNCE_DELAY)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -239,8 +250,6 @@ class SearchActivity : AppCompatActivity() {
         llSearchIsEmpty.isVisible = false
         llSearchNoInternet.isVisible = false
         pbSearch.isVisible = false
-        Log.d("MyTag", "rvSearchResult.isVisible: ${rvSearchResult.isVisible}")
-        Log.d("MyTag", "tracksHistory: $tracksHistory")
     }
 
     private fun showEmptyResults() {
@@ -295,6 +304,7 @@ class SearchActivity : AppCompatActivity() {
         private const val SHARED_PREFERENCES = "shared_prefs"
         const val EDIT_TEXT = "EDIT_TEXT"
         const val TEXT_DEF = ""
+        const val SEARCH_DEBOUNCE_DELAY = 2000L
         const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }
