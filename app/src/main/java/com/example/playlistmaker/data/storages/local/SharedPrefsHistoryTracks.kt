@@ -3,7 +3,7 @@ package com.example.playlistmaker.data.storages.local
 import android.content.SharedPreferences
 import androidx.core.content.edit
 
-class SharedPrefsHistoryTracks (
+class SharedPrefsHistoryTracks(
     private val sharedPreferences: SharedPreferences,
     private val key: String
 ) : SharedPrefsClient<String> {
@@ -14,6 +14,7 @@ class SharedPrefsHistoryTracks (
     override fun load(data: String): String {
         return sharedPreferences.getString(key, data) ?: ""
     }
+
     override fun clear(data: String) {
         sharedPreferences.edit { remove(key) }
     }

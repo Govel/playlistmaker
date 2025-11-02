@@ -16,6 +16,7 @@ class TrackViewHolder(item: View) : RecyclerView.ViewHolder(item) {
     private val tvTrackName: TextView = itemView.findViewById(R.id.tvTrackName)
     private val tvTrackBand: TextView = itemView.findViewById(R.id.tvTrackBand)
     private val tvTrackTime: TextView = itemView.findViewById(R.id.tvTrackTime)
+
     @SuppressLint("RestrictedApi")
     fun bind(data: Track?) {
         tvTrackName.text = data?.trackName

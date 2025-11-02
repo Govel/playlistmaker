@@ -1,9 +1,7 @@
-package com.example.playlistmaker.domain.repository
+package com.example.playlistmaker.domain.repository.settings
 
-interface NightModeRepository {
+interface NightModeInteractor {
     fun switchMode(isModeEnabled: Boolean)
-
     fun getSettingsValue(): Boolean
-
     fun setNightMode()
 }

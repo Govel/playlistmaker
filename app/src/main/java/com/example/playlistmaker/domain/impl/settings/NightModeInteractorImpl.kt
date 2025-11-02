@@ -1,11 +1,11 @@
-package com.example.playlistmaker.domain.impl
+package com.example.playlistmaker.domain.impl.settings
 
-import com.example.playlistmaker.domain.repository.NightModeInteractor
-import com.example.playlistmaker.domain.repository.NightModeRepository
+import com.example.playlistmaker.domain.repository.settings.NightModeInteractor
+import com.example.playlistmaker.domain.repository.settings.NightModeRepository
 
 class NightModeInteractorImpl(
     private val nightModeRepository: NightModeRepository
-): NightModeInteractor {
+) : NightModeInteractor {
     override fun switchMode(isModeEnabled: Boolean) {
         nightModeRepository.switchMode(isModeEnabled)
     }

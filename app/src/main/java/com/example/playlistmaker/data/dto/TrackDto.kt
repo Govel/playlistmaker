@@ -1,6 +1,6 @@
 package com.example.playlistmaker.data.dto
 
-data class TrackDto (
+data class TrackDto(
     val trackId: Long,
     val trackName: String,
     val artistName: String,
@@ -11,6 +11,4 @@ data class TrackDto (
     val releaseDate: String?,
     val primaryGenreName: String?,
     val country: String?
-) {
-    fun getYearTrack() = releaseDate?.split('-')[0]
-}
+)

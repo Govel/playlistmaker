@@ -4,7 +4,7 @@ import com.example.playlistmaker.data.dto.TrackHistory
 import com.example.playlistmaker.domain.models.Track
 
 object TrackHistoryMapper {
-    fun mapToHistory(model: Track) : TrackHistory {
+    fun mapToHistory(model: Track): TrackHistory {
         return TrackHistory(
             trackId = model.trackId,
             trackName = model.trackName,
@@ -23,7 +23,7 @@ object TrackHistoryMapper {
         mapToHistory(it)
     }
 
-    fun mapToDomain(item: TrackHistory) : Track {
+    fun mapToDomain(item: TrackHistory): Track {
         return Track(
             trackId = item.trackId,
             trackName = item.trackName,

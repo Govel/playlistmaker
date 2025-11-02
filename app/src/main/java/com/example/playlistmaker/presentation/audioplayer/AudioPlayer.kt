@@ -1,12 +1,10 @@
 package com.example.playlistmaker.presentation.audioplayer
 
 import android.annotation.SuppressLint
-import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +15,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.playlistmaker.Creator
 import com.example.playlistmaker.LocalUtils
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.models.TAG_CURRENT_TRACK
@@ -24,16 +23,8 @@ import com.example.playlistmaker.domain.models.Track
 import com.google.android.material.appbar.MaterialToolbar
 
 class AudioPlayer : AppCompatActivity() {
-
-    companion object {
-        private const val STATE_DEFAULT = 0
-        private const val STATE_PREPARED = 1
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
-    }
-    private var playerState = STATE_DEFAULT
+    private val mediaPlayerInteractor = Creator.provideMediaPlayerInteractor()
     private val handler = Handler(Looper.getMainLooper())
-    private var mediaPlayer = MediaPlayer()
     private lateinit var materialToolbar: MaterialToolbar
     private lateinit var ivArtwork: ImageView
     private lateinit var main: ConstraintLayout
@@ -95,7 +86,6 @@ class AudioPlayer : AppCompatActivity() {
             .fitCenter()
             .transform(
                 RoundedCorners(
-
                     LocalUtils().dpToPx(8.0f, main)
                 )
             )
@@ -104,7 +94,8 @@ class AudioPlayer : AppCompatActivity() {
         tvTrackName.text = currentTrack.trackName
         tvArtistName.text = currentTrack.artistName
         tvTrackTimeMillis.text = LocalUtils().dateFormat(currentTrack.trackTimeMillis)
-        tvTrackTime.text = LocalUtils().dateFormat(mediaPlayer.currentPosition.toLong())
+        tvTrackTime.text =
+            LocalUtils().dateFormat(mediaPlayerInteractor.getCurrentPosition().toLong())
         if (currentTrack.collectionName.isNullOrEmpty()) {
             groupAlbum.isVisible = false
         } else {
@@ -120,79 +111,58 @@ class AudioPlayer : AppCompatActivity() {
         tvPrimaryGenreTrackName.text = currentTrack.primaryGenreName ?: ""
         tvTrackCountry.text = currentTrack.country ?: ""
 
-        preparePlayer()
+        mediaPlayerInteractor.preparePlayer(currentTrack.previewUrl)
         btPlay.setOnClickListener {
-            playbackControl()
+            mediaPlayerInteractor.playbackControl()
+            setImageButtonPlay()
+            setTimer()
         }
+
     }
 
     override fun onPause() {
         super.onPause()
-        pausePlayer()
+        mediaPlayerInteractor.pausePlayer()
     }
 
     @SuppressLint("ImplicitSamInstance")
     override fun onDestroy() {
         super.onDestroy()
-        mediaPlayer.release()
-        handler.removeCallbacks { runnable() }
+        mediaPlayerInteractor.releasePlayer()
     }
 
-    private fun playbackControl() {
-        when(playerState) {
-            STATE_PLAYING -> {
-                pausePlayer()
-            }
-            STATE_PREPARED, STATE_PAUSED -> {
-                startPlayer()
-            }
-        }
-    }
-
-    @SuppressLint("ImplicitSamInstance")
-    private fun preparePlayer() {
-        mediaPlayer.setDataSource(currentTrack.previewUrl)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
-            btPlay.isEnabled = true
-            playerState = STATE_PREPARED
-        }
-        mediaPlayer.setOnCompletionListener {
-            btPlay.setImageResource(R.drawable.play)
-            playerState = STATE_PREPARED
-            handler.removeCallbacks { runnable() }
-            tvTrackTime.text = "00:00"
-        }
-    }
-
-    @SuppressLint("ImplicitSamInstance")
-    private fun startPlayer() {
-        mediaPlayer.start()
-        btPlay.setImageResource(R.drawable.pause)
-        playerState = STATE_PLAYING
-        handler.removeCallbacks { runnable() }
-        handler.post(runnable())
-
-    }
-
-    @SuppressLint("ImplicitSamInstance")
-    private fun pausePlayer() {
-        mediaPlayer.pause()
-        btPlay.setImageResource(R.drawable.play)
-        playerState = STATE_PAUSED
-        handler.removeCallbacks { runnable() }
-    }
-    private fun runnable() : Runnable {
-        return object : Runnable {
-            @SuppressLint("SimpleDateFormat")
-            override fun run() {
-                if (playerState == STATE_PLAYING) {
-                    tvTrackTime.text = LocalUtils().dateFormat(mediaPlayer.currentPosition.toLong() + 1)
-                    Log.d("MyTag", tvTrackTime.text.toString())
-                    handler.postDelayed(this, 400L)
+    private fun setTimer() {
+        handler.postDelayed(
+            object : Runnable {
+                @SuppressLint("SimpleDateFormat")
+                override fun run() {
+                    if (mediaPlayerInteractor.isStatePlayerPlaying()) {
+                        tvTrackTime.text =
+                            LocalUtils().dateFormat(
+                                mediaPlayerInteractor.getCurrentPosition().toLong()
+                            )
+                        handler.postDelayed(this, DELAY_MILLIS)
+                    } else {
+                        handler.removeCallbacks(this)
+                        if (mediaPlayerInteractor.isStatePlayerPrepared()) {
+                            tvTrackTime.text = LocalUtils().dateFormat(0L)
+                            setImageButtonPlay()
+                        }
+                    }
                 }
-            }
+            }, DELAY_MILLIS
+        )
+    }
+
+    private fun setImageButtonPlay() {
+        if (mediaPlayerInteractor.isStatePlayerPlaying()) {
+            btPlay.setImageResource(R.drawable.pause)
+        } else {
+            btPlay.setImageResource(R.drawable.play)
         }
     }
 
+    companion object {
+        private const val DELAY_MILLIS = 400L
+    }
 }

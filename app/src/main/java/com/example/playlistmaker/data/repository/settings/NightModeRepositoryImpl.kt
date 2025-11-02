@@ -1,17 +1,15 @@
-package com.example.playlistmaker.data.repository
+package com.example.playlistmaker.data.repository.settings
 
 import android.content.Context
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlistmaker.data.storages.local.SharedPrefsClient
-import com.example.playlistmaker.data.storages.local.SharedPrefsNightMode
-import com.example.playlistmaker.domain.repository.NightModeRepository
+import com.example.playlistmaker.domain.repository.settings.NightModeRepository
 
 class NightModeRepositoryImpl(
     private val nightModePrefsClient: SharedPrefsClient<Boolean>,
     private val appContext: Context
 ) : NightModeRepository {
-
     private fun isModeOn(): Boolean {
         val darkModeFlag =
             appContext.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK

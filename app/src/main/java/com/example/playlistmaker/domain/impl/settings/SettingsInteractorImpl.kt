@@ -1,20 +1,14 @@
-package com.example.playlistmaker.domain.impl
+package com.example.playlistmaker.domain.impl.settings
 
 import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.net.Uri
-import com.example.playlistmaker.App
 import com.example.playlistmaker.R
-import com.example.playlistmaker.THEME_SWITCH_KEY
-import com.example.playlistmaker.domain.repository.NightModeInteractor
-import com.example.playlistmaker.domain.repository.SettingsInteractor
-import com.example.playlistmaker.presentation.tracks.SearchHistory
-import com.google.android.material.materialswitch.MaterialSwitch
+import com.example.playlistmaker.domain.repository.settings.SettingsInteractor
 
 class SettingsInteractorImpl(
     val context: Context
-): SettingsInteractor {
+) : SettingsInteractor {
     override fun getFrameShare() {
         val message = context.getString(R.string.share_app_url)
         val shareIntent = Intent(Intent.ACTION_SEND)
@@ -42,7 +36,4 @@ class SettingsInteractorImpl(
         val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(userAgreementUrl))
         context.startActivity(browserIntent)
     }
-
-
-
 }

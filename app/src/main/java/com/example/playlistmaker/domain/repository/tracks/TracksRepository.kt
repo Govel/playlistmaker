@@ -1,4 +1,4 @@
-package com.example.playlistmaker.domain.repository
+package com.example.playlistmaker.domain.repository.tracks
 
 import com.example.playlistmaker.domain.models.Resource
 import com.example.playlistmaker.domain.models.Track

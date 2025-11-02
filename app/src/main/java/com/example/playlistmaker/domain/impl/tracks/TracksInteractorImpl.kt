@@ -1,13 +1,13 @@
-package com.example.playlistmaker.domain.impl
+package com.example.playlistmaker.domain.impl.tracks
 
-import com.example.playlistmaker.domain.repository.HistoryRepository
-import com.example.playlistmaker.domain.repository.TracksInteractor
-import com.example.playlistmaker.domain.repository.TracksRepository
 import com.example.playlistmaker.domain.consumer.Consumer
 import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.domain.repository.tracks.HistoryRepository
+import com.example.playlistmaker.domain.repository.tracks.TracksInteractor
+import com.example.playlistmaker.domain.repository.tracks.TracksRepository
 import java.util.concurrent.Executors
 
-class TracksInteractorImpl (
+class TracksInteractorImpl(
     private val trackRepository: TracksRepository,
     private val historyRepository: HistoryRepository
 ) : TracksInteractor {

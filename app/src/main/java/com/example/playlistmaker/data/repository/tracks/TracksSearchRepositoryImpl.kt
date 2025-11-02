@@ -1,9 +1,9 @@
-package com.example.playlistmaker.data.repository
+package com.example.playlistmaker.data.repository.tracks
 
 import com.example.playlistmaker.data.storages.network.NetworkClient
 import com.example.playlistmaker.data.dto.TracksSearchResponse
 import com.example.playlistmaker.data.mapper.TracksSearchMapper
-import com.example.playlistmaker.domain.repository.TracksRepository
+import com.example.playlistmaker.domain.repository.tracks.TracksRepository
 import com.example.playlistmaker.domain.models.Resource
 import com.example.playlistmaker.domain.models.Track
 

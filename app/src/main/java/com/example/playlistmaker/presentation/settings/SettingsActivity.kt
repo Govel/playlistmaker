@@ -7,8 +7,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.Creator
 import com.example.playlistmaker.R
-import com.example.playlistmaker.domain.repository.NightModeInteractor
-import com.example.playlistmaker.domain.repository.SettingsInteractor
+import com.example.playlistmaker.domain.repository.settings.NightModeInteractor
+import com.example.playlistmaker.domain.repository.settings.SettingsInteractor
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 
@@ -27,7 +27,7 @@ class SettingsActivity : AppCompatActivity() {
             insets
         }
         settingsInteractor = Creator.provideSettingsInteractor(this)
-        val materialToolbar : MaterialToolbar = findViewById(R.id.mtb_arrowback)
+        val materialToolbar: MaterialToolbar = findViewById(R.id.mtb_arrowback)
         materialToolbar.setNavigationOnClickListener {
             finish()
         }

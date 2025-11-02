@@ -1,18 +1,17 @@
-package com.example.playlistmaker.data.repository
+package com.example.playlistmaker.data.repository.tracks
 
 import com.example.playlistmaker.data.dto.TrackHistory
 import com.example.playlistmaker.data.mapper.TrackHistoryMapper
 import com.example.playlistmaker.data.storages.local.SharedPrefsClient
-import com.example.playlistmaker.domain.repository.HistoryRepository
+import com.example.playlistmaker.domain.repository.tracks.HistoryRepository
 import com.example.playlistmaker.domain.models.Track
 import com.google.gson.Gson
 import kotlin.collections.removeAll
 
-class HistoryRepositoryImpl (
+class HistoryRepositoryImpl(
     private val prefs: SharedPrefsClient<String>,
     private val gson: Gson = Gson(),
 ) : HistoryRepository {
-
     override fun loadTracksFromHistory(): MutableList<Track> {
         val json = prefs.load("")
         return TrackHistoryMapper.mapListToDomain(

@@ -36,7 +36,6 @@ class SearchActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private var searchRunnable: Runnable? = null
     private var tracksInteractor = Creator.provideTracksInteractor(SHARED_PREFERENCES)
-
     private val tracksSearch = ArrayList<Track>()
     private val tracksHistory = mutableListOf<Track>()
     private var adapter = TrackAdapter(tracksSearch) { clickedTrack ->
@@ -49,7 +48,6 @@ class SearchActivity : AppCompatActivity() {
             loadSearchHistory()
         }
     }
-//    private var lastCall: Call<TracksSearchResponse>? = null
     private lateinit var materialToolbar: MaterialToolbar
     private lateinit var searchEditText: EditText
     private lateinit var clearButton: ImageView
@@ -60,7 +58,6 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var llSearchIsEmpty: LinearLayout
     private lateinit var llSearchNoInternet: LinearLayout
     private lateinit var llSearchHistory: LinearLayout
-    private lateinit var searchHistory: SearchHistory
     private lateinit var pbSearch: FrameLayout
     private var isClickAllowed = true
 
@@ -93,8 +90,6 @@ class SearchActivity : AppCompatActivity() {
         llSearchNoInternet = findViewById(R.id.search_no_internet)
         llSearchHistory = findViewById(R.id.ll_search_history)
         pbSearch = findViewById(R.id.pb_search)
-        val sharedPrefs = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE)
-        searchHistory = SearchHistory(sharedPrefs)
         loadSearchHistory()
 
         adapter = TrackAdapter(tracksSearch) { clickedTrack ->
@@ -136,8 +131,7 @@ class SearchActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 llSearchHistory.isVisible = !searchEditText.hasFocus()
-                clearButton.isVisible = clearButtonVisability(s)
-//                searchDebounce()
+                clearButton.isVisible = clearButtonVisibility(s)
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -148,7 +142,6 @@ class SearchActivity : AppCompatActivity() {
         searchEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 searchRequest()
-                true
             }
             false
         }
@@ -157,25 +150,6 @@ class SearchActivity : AppCompatActivity() {
         }
         btSearchUpdate.setOnClickListener {
             searchRequest()
-//            val retryCall = lastCall?.clone()
-//            llSearchNoInternet.isVisible = false
-//            pbSearch.isVisible = true
-//            lastCall = retryCall
-//            retryCall?.enqueue(object : Callback<TracksSearchResponse> {
-//                @SuppressLint("NotifyDataSetChanged")
-//                override fun onResponse(
-//                    call: Call<TracksSearchResponse?>,
-//                    response: Response<TracksSearchResponse?>
-//                ) {
-//                    pbSearch.isVisible = false
-//                    handleSearchResponse(response)
-//                }
-//
-//                override fun onFailure(call: Call<TracksSearchResponse?>, t: Throwable) {
-//                    pbSearch.isVisible = false
-//                    handleSearchFailure()
-//                }
-//            })
         }
 
         clearButton.setOnClickListener {
@@ -207,9 +181,10 @@ class SearchActivity : AppCompatActivity() {
         searchEditText.setText(editTextSaver)
     }
 
-    private fun clearButtonVisability(s: CharSequence?): Boolean {
+    private fun clearButtonVisibility(s: CharSequence?): Boolean {
         return !s.isNullOrEmpty()
     }
+
     private fun stopCurrentRunnable() {
         val currentRunnable = searchRunnable
         if (currentRunnable != null) {
@@ -217,6 +192,7 @@ class SearchActivity : AppCompatActivity() {
         }
         handler.removeCallbacks(searchRequestRunnable)
     }
+
     private fun searchRequest() {
         Log.d("MyTag", tracksInteractor.toString())
         if (editTextSaver.isNotEmpty()) {
@@ -247,11 +223,8 @@ class SearchActivity : AppCompatActivity() {
                 })
         }
     }
-    private fun searchDebounce() {
-        handler.removeCallbacks(searchRunnable!!)
-        handler.postDelayed(searchRunnable!!, SEARCH_DEBOUNCE_DELAY)
-    }
-    private fun clickDebounce() : Boolean {
+
+    private fun clickDebounce(): Boolean {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
@@ -259,25 +232,6 @@ class SearchActivity : AppCompatActivity() {
         }
         return current
     }
-//    private fun handleSearchResponse(response: Response<TracksSearchResponse?>) {
-//        if (response.isSuccessful) { // response.code() in 200..299
-//            val results = response.body()?.results
-//            if (!results.isNullOrEmpty()) {
-//                tracks.clear()
-//                tracks.addAll(results)
-//                adapter.notifyDataSetChanged()
-//                showContent()
-//            } else {
-//                showEmptyResults()
-//            }
-//        } else {
-//            showNetworkError()
-//        }
-//    }
-//
-//    private fun handleSearchFailure() {
-//        showNetworkError()
-//    }
 
     private fun showContent() {
         llSearchHistory.isVisible = false
@@ -308,6 +262,7 @@ class SearchActivity : AppCompatActivity() {
         llSearchNoInternet.isVisible = true
         pbSearch.isVisible = false
     }
+
     private fun showHistory() {
         tracksSearch.clear()
         adapter.notifyDataSetChanged()
@@ -317,6 +272,7 @@ class SearchActivity : AppCompatActivity() {
         llSearchNoInternet.isVisible = false
         pbSearch.isVisible = false
     }
+
     private fun showProgressBar() {
         tracksSearch.clear()
         adapter.notifyDataSetChanged()
@@ -334,11 +290,11 @@ class SearchActivity : AppCompatActivity() {
         adapterHistory.notifyDataSetChanged()
         llSearchHistory.isVisible = tracksHistory.isNotEmpty()
     }
+
     companion object {
         private const val SHARED_PREFERENCES = "shared_prefs"
         const val EDIT_TEXT = "EDIT_TEXT"
         const val TEXT_DEF = ""
-        const val SEARCH_DEBOUNCE_DELAY = 2000L
         const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }
