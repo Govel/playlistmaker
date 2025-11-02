@@ -1,7 +1,10 @@
-.DS_Store
-.AppleDouble
-.LSOverride
+*.iml
 .gradle
-.git/*
-.idea/*
-.kotlin/*
+/local.properties
+/.idea/*
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
