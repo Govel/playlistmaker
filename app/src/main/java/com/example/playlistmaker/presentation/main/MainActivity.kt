@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.presentation.main
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -7,7 +7,10 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-
+import com.example.playlistmaker.R
+import com.example.playlistmaker.presentation.settings.SettingsActivity
+import com.example.playlistmaker.presentation.media.MediaActivity
+import com.example.playlistmaker.presentation.tracks.SearchActivity
 
 class MainActivity : AppCompatActivity() {
     @SuppressLint("ServiceCast")

@@ -1,10 +1,12 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.presentation.tracks
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.models.Track
 
-class TrackAdapter (
+class TrackAdapter(
     private val tracks: List<Track>,
     private val onItemClick: (Track) -> Unit
 ) : RecyclerView.Adapter<TrackViewHolder>() {
@@ -24,6 +26,5 @@ class TrackAdapter (
         holder.itemView.setOnClickListener {
             onItemClick(track)
         }
-
     }
 }

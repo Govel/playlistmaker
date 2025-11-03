@@ -10,6 +10,8 @@
     <color name="yp_light_gray">#E6E8EB</color>
     <color name="colorPrimaryVariant">@color/yp_gray</color>
     <color name="colorPrimary">@color/yp_blue</color>
+    <color name="main_bg_color">@color/yp_blue</color>
+    <color name="secondary_bg_color">@color/yp_white</color>
     <color name="colorOnPrimary">@color/yp_black</color>
     <color name="gray_white">@color/yp_gray</color>
     <color name="icon_placeholder_color">@color/icon_black</color>

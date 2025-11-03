@@ -1,11 +1,12 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.domain.models
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 const val TAG_CURRENT_TRACK = "current_track"
+
 @Parcelize
-data class Track (
+data class Track(
     val trackId: Long,
     val trackName: String,
     val artistName: String,
@@ -17,6 +18,6 @@ data class Track (
     val primaryGenreName: String?,
     val country: String?
 ) : Parcelable {
-    fun getCoverArtwork() = artworkUrl100.replaceAfterLast('/',"512x512bb.jpg")
+    fun getCoverArtwork() = artworkUrl100.replaceAfterLast('/', "512x512bb.jpg")
     fun getYearTrack() = releaseDate?.split('-')[0]
 }
