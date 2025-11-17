@@ -2,6 +2,7 @@ package com.example.playlistmaker
 
 import android.app.Application
 import android.content.res.Configuration
+import com.example.playlistmaker.creator.Creator
 
 const val THEME_SWITCH_KEY = "theme_switch_key"
 class App : Application() {
