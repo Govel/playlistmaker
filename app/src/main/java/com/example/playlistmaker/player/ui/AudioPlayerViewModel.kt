@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlistmaker.LocalUtils
+import com.example.playlistmaker.util.LocalUtils
 import com.example.playlistmaker.player.ui.models.PlayerState
 import com.example.playlistmaker.player.ui.models.PlayerStatus
 import java.text.SimpleDateFormat

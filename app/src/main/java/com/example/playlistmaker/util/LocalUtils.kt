@@ -1,10 +1,9 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.util
 
 import android.util.TypedValue
 import android.view.View
 import java.text.SimpleDateFormat
 import java.util.Locale
-
 
 class LocalUtils {
     fun dpToPx(dp: Float, view: View): Int {

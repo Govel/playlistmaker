@@ -1,7 +1,5 @@
 package com.example.playlistmaker.search.ui
 
-import android.os.Message
-import com.example.playlistmaker.search.domain.models.Resource
 import com.example.playlistmaker.search.domain.models.Track
 
 sealed interface SearchState {

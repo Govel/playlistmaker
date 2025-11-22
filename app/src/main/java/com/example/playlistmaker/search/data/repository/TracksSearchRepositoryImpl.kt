@@ -9,13 +9,20 @@ import com.example.playlistmaker.search.domain.models.Track
 
 class TracksSearchRepositoryImpl(private val networkClient: NetworkClient) : TracksRepository {
     override fun searchTracks(expression: String): Resource<List<Track>?> {
-        val response = networkClient.doRequest(expression)
-        return if (response is TracksSearchResponse) {
-            val tracksDtoList = response.results
-            val tracks = TracksSearchMapper.mapDtoListToDomain(tracksDtoList)
-            Resource(expression, tracks)
-        } else {
-            Resource(expression, null)
+        return when (val response = networkClient.doRequest(expression)) {
+            is TracksSearchResponse if response.resultCount > 0 -> {
+                val tracksDtoList = response.results
+                val tracks = TracksSearchMapper.mapDtoListToDomain(tracksDtoList)
+                Resource(expression, tracks, "")
+            }
+
+            is TracksSearchResponse if response.resultCount == 0 -> {
+                Resource(expression, null, "empty")
+            }
+
+            else -> {
+                Resource(expression, null, "error")
+            }
         }
 
     }

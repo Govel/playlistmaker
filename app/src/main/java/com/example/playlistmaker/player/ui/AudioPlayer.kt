@@ -9,7 +9,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.playlistmaker.LocalUtils
+import com.example.playlistmaker.util.LocalUtils
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityAudioplayerBinding
 import com.example.playlistmaker.player.ui.models.PlayerState
@@ -81,7 +81,6 @@ class AudioPlayer : AppCompatActivity() {
             setImageButtonPlay(it.playerState == PlayerState.STATE_PLAYING)
             enableButton(it.playerState != PlayerState.STATE_DEFAULT)
             binding.tvTrackTime.text = it.timer
-
         }
         binding.btPlay.setOnClickListener {
             viewModel.onPlayButtonClicked()

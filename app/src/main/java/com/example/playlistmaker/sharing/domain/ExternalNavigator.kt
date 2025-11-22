@@ -1,6 +1,5 @@
 package com.example.playlistmaker.sharing.domain
 
-import android.content.Intent
 import com.example.playlistmaker.sharing.data.model.EmailData
 
 interface ExternalNavigator {

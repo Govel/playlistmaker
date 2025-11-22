@@ -1,48 +1,45 @@
 package com.example.playlistmaker.search.ui
 
-import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlistmaker.App
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.search.domain.consumer.Consumer
 import com.example.playlistmaker.search.domain.models.Resource
 import com.example.playlistmaker.search.domain.models.Track
+import com.example.playlistmaker.search.domain.repository.TracksInteractor
 import kotlinx.coroutines.Runnable
 
-class SearchViewModel(private val context: Context): ViewModel() {
+class SearchViewModel(
+    private val tracksInteractor: TracksInteractor
+) : ViewModel() {
     private val stateSearchLiveData = MutableLiveData<SearchState>()
     fun observeStateSearch(): LiveData<SearchState> = stateSearchLiveData
     private val handler = Handler(Looper.getMainLooper())
-    private var tracksInteractor = Creator.provideTracksInteractor(SHARED_PREFERENCES)
     private var searchRunnable: Runnable? = null
 
     private var latestSearchText: String? = null
 
     fun searchDebounce(changedText: String) {
+        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
+        val searchRunnable = Runnable { searchRequest(changedText) }
         if (latestSearchText == changedText) {
-            return
+            handler.post(searchRunnable)
+        } else {
+            val postTime = SystemClock.uptimeMillis() + SEARCH_DEBOUNCE_DELAY
+            handler.postAtTime(
+                searchRunnable,
+                SEARCH_REQUEST_TOKEN,
+                postTime,
+            )
         }
         this.latestSearchText = changedText
-        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
-
-        val searchRunnable = Runnable { searchRequest(changedText) }
-
-        val postTime = SystemClock.uptimeMillis() + SEARCH_DEBOUNCE_DELAY
-        handler.postAtTime(
-            searchRunnable,
-            SEARCH_REQUEST_TOKEN,
-            postTime,
-        )
     }
 
     private fun searchRequest(newSearchText: String) {
@@ -52,25 +49,23 @@ class SearchViewModel(private val context: Context): ViewModel() {
                 expression = newSearchText,
                 consumer = object : Consumer {
                     override fun consume(foundTracks: Resource<List<Track>?>) {
-                        Log.d("MyTag", "newSearchText: $newSearchText, foundTracks.expression: ${foundTracks.expression}")
-                        Log.d("MyTag", "foundTracks: ${foundTracks.data}")
                         val tracks = mutableListOf<Track>()
                         val newSearchRunnable = Runnable {
-                            if (foundTracks.data != null && foundTracks.expression == newSearchText) {
+                            if (foundTracks.data != null && foundTracks.expression == newSearchText && foundTracks.message != "error") {
                                 tracks.clear()
                                 tracks.addAll(foundTracks.data)
                             }
                             when {
-                                tracks.isEmpty() ->{
-                                    renderState(SearchState.Empty("Empty"))
-                                    Log.d("MyTag", "state Empty")
+                                tracks.isEmpty() && foundTracks.message == "empty" -> {
+                                    renderState(SearchState.Empty(foundTracks.message))
                                 }
 
-
+                                tracks.isEmpty() && foundTracks.message == "error" -> {
+                                    renderState(SearchState.Error(foundTracks.message))
+                                }
 
                                 else -> {
                                     renderState(SearchState.Content(tracks))
-                                    Log.d("MyTag", "state Content")
                                 }
                             }
                         }
@@ -90,13 +85,20 @@ class SearchViewModel(private val context: Context): ViewModel() {
         handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
     }
 
+    fun saveTrackToHistory(clickedTrack: Track) = tracksInteractor.saveTrackToHistory(clickedTrack)
+
+    fun clearHistory() = tracksInteractor.clearHistory()
+
+    fun loadTracksFromHistory(): Collection<Track> = tracksInteractor.loadTracksFromHistory()
+
     companion object {
         fun getFactory(): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val app = (this[APPLICATION_KEY] as App)
-                SearchViewModel(app)
+                val provideTracksInteractor = Creator.provideTracksInteractor(SHARED_PREFERENCES)
+                SearchViewModel(provideTracksInteractor)
             }
         }
+
         private const val SHARED_PREFERENCES = "shared_prefs"
         const val SEARCH_DEBOUNCE_DELAY = 2000L
         private val SEARCH_REQUEST_TOKEN = Any()

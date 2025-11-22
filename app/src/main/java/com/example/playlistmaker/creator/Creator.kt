@@ -3,18 +3,19 @@ package com.example.playlistmaker.creator
 import android.app.Application
 import android.content.Context
 import com.example.playlistmaker.App
-import com.example.playlistmaker.settings.data.NightModeRepositoryImpl
 import com.example.playlistmaker.search.data.repository.HistoryRepositoryImpl
 import com.example.playlistmaker.search.data.repository.TracksSearchRepositoryImpl
 import com.example.playlistmaker.search.data.storages.local.SharedPrefsClient
 import com.example.playlistmaker.search.data.storages.local.SharedPrefsHistoryTracks
 import com.example.playlistmaker.search.data.storages.local.SharedPrefsNightMode
 import com.example.playlistmaker.search.data.storages.network.RetrofitNetworkClient
-import com.example.playlistmaker.settings.domain.impl.NightModeInteractorImpl
 import com.example.playlistmaker.search.domain.impl.TracksInteractorImpl
-import com.example.playlistmaker.settings.domain.repository.NightModeRepository
 import com.example.playlistmaker.search.domain.repository.HistoryRepository
 import com.example.playlistmaker.search.domain.repository.TracksInteractor
+import com.example.playlistmaker.settings.data.SettingsRepository
+import com.example.playlistmaker.settings.data.SettingsRepositoryImpl
+import com.example.playlistmaker.settings.domain.impl.SettingsInteractorImpl
+import com.example.playlistmaker.settings.domain.repository.SettingsInteractor
 import com.example.playlistmaker.sharing.data.impl.ExternalNavigatorImpl
 import com.example.playlistmaker.sharing.domain.ExternalNavigator
 import com.example.playlistmaker.sharing.domain.SharingInteractor
@@ -43,15 +44,8 @@ object Creator {
     private fun getNightModePrefsClient(key: String): SharedPrefsClient<Boolean> =
         SharedPrefsNightMode(provideSharedPreferences(key), key)
 
-    private fun getNightModeRepository(key: String): NightModeRepository =
-        NightModeRepositoryImpl(
-            getNightModePrefsClient(key),
-            getAppContext()
-        )
-
-    fun provideNightModeInteractor() = NightModeInteractorImpl(getNightModeRepository(keyNightMode))
     private fun getRetrofitNetworkClient(): RetrofitNetworkClient {
-        return RetrofitNetworkClient()
+        return RetrofitNetworkClient(getAppContext())
     }
     private fun getTracksRepositoryImpl(): TracksSearchRepositoryImpl {
         return TracksSearchRepositoryImpl(getRetrofitNetworkClient())
@@ -66,10 +60,20 @@ object Creator {
         return TracksInteractorImpl(getTracksRepositoryImpl(), getHistoryRepository(key))
     }
     private fun getExternalNavigator(): ExternalNavigator {
-        return ExternalNavigatorImpl()
+        return ExternalNavigatorImpl(getAppContext())
     }
-    fun provideSharingInteractor(externalNavigator: ExternalNavigator): SharingInteractor {
+    fun provideSharingInteractor(): SharingInteractor {
         return SharingInteractorImpl(getExternalNavigator(), getAppContext())
+    }
+
+    private fun getSettingsRepository(key: String): SettingsRepository {
+        return SettingsRepositoryImpl(
+            getNightModePrefsClient(key),
+            getAppContext()
+        )
+    }
+    fun provideSettingsInteractor(): SettingsInteractor {
+        return SettingsInteractorImpl(getSettingsRepository(keyNightMode))
     }
 
 }

@@ -2,7 +2,6 @@ package com.example.playlistmaker.sharing.domain
 
 
 import android.content.Context
-import com.example.playlistmaker.App
 import com.example.playlistmaker.R
 import com.example.playlistmaker.sharing.data.model.EmailData
 

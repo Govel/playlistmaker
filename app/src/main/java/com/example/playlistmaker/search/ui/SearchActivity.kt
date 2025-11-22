@@ -7,7 +7,6 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
@@ -16,34 +15,28 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.example.playlistmaker.R
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.player.ui.AudioPlayer
-import com.example.playlistmaker.search.domain.consumer.Consumer
-import com.example.playlistmaker.search.domain.models.Resource
 import com.example.playlistmaker.search.domain.models.TAG_CURRENT_TRACK
 import com.example.playlistmaker.search.domain.models.Track
-import kotlinx.coroutines.Runnable
 
 class SearchActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchBinding
     private var viewModel: SearchViewModel? = null
     private var editTextSaver: String = TEXT_DEF
-    private var tracksInteractor = Creator.provideTracksInteractor(SHARED_PREFERENCES)
     private val tracksSearch = ArrayList<Track>()
     private val tracksHistory = mutableListOf<Track>()
     private val handler = Handler(Looper.getMainLooper())
     private var adapter = TrackAdapter(tracksSearch) { clickedTrack ->
-        tracksInteractor.saveTrackToHistory(clickedTrack)
+        viewModel?.saveTrackToHistory(clickedTrack)
         loadSearchHistory()
     }
     private var adapterHistory = TrackAdapter(tracksHistory) { clickedTrack ->
         if (clickDebounce()) {
-            tracksInteractor.saveTrackToHistory(clickedTrack)
+            viewModel?.saveTrackToHistory(clickedTrack)
             loadSearchHistory()
         }
     }
-
     private var isClickAllowed = true
 
     @SuppressLint("WrongViewCast")
@@ -51,6 +44,8 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        viewModel =
+            ViewModelProvider(this, SearchViewModel.getFactory())[SearchViewModel::class.java]
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
@@ -69,7 +64,7 @@ class SearchActivity : AppCompatActivity() {
 
         adapter = TrackAdapter(tracksSearch) { clickedTrack ->
             if (clickDebounce()) {
-                tracksInteractor.saveTrackToHistory(clickedTrack)
+                viewModel?.saveTrackToHistory(clickedTrack)
                 loadSearchHistory()
                 val displayAudioPlayer = Intent(this, AudioPlayer::class.java)
                 displayAudioPlayer.putExtra(TAG_CURRENT_TRACK, clickedTrack)
@@ -79,7 +74,7 @@ class SearchActivity : AppCompatActivity() {
 
         adapterHistory = TrackAdapter(tracksHistory) { clickedTrack ->
             if (clickDebounce()) {
-                tracksInteractor.saveTrackToHistory(clickedTrack)
+                viewModel?.saveTrackToHistory(clickedTrack)
                 loadSearchHistory()
                 val displayAudioPlayer = Intent(this, AudioPlayer::class.java)
                 displayAudioPlayer.putExtra(TAG_CURRENT_TRACK, clickedTrack)
@@ -90,8 +85,7 @@ class SearchActivity : AppCompatActivity() {
         binding.rvSearchResult.adapter = adapter
         binding.rvSearchHistory.adapter = adapterHistory
 
-        viewModel =
-            ViewModelProvider(this, SearchViewModel.getFactory())[SearchViewModel::class.java]
+
 
         viewModel?.observeStateSearch()?.observe(this) {
             render(it)
@@ -130,10 +124,7 @@ class SearchActivity : AppCompatActivity() {
             binding.searchBar.addTextChangedListener(searchTextWatcher)
             binding.searchBar.setOnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    Log.d("MyTag", "Enter")
-                    viewModel?.observeStateSearch()?.observe(this) {
-                        render(it)
-                    }
+                    viewModel?.searchDebounce(binding.searchBar.text.toString())
                 }
                 false
             }
@@ -144,7 +135,7 @@ class SearchActivity : AppCompatActivity() {
 
 
         binding.btSearchUpdate.setOnClickListener {
-            Log.d("MyTag", "networkerrorupdate")
+            viewModel?.searchDebounce(binding.searchBar.text.toString())
             viewModel?.observeStateSearch()?.observe(this) {
                 render(it)
             }
@@ -160,7 +151,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         binding.btClearHistory.setOnClickListener {
-            tracksInteractor.clearHistory()
+            viewModel?.clearHistory()
             tracksHistory.clear()
             adapterHistory.notifyDataSetChanged()
             binding.llSearchHistory.isVisible = false
@@ -245,7 +236,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun loadSearchHistory() {
-        val saved = tracksInteractor.loadTracksFromHistory()
+        val saved = viewModel?.loadTracksFromHistory()!!
         tracksHistory.clear()
         tracksHistory.addAll(saved)
         adapterHistory.notifyDataSetChanged()
@@ -253,7 +244,6 @@ class SearchActivity : AppCompatActivity() {
     }
 
     fun render(state: SearchState) {
-        Log.d("MyTag", "state: $state")
         when (state) {
             is SearchState.Loading -> showProgressBar()
             is SearchState.Content -> showContent(state.tracks)
@@ -263,7 +253,6 @@ class SearchActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val SHARED_PREFERENCES = "shared_prefs"
         const val EDIT_TEXT = "EDIT_TEXT"
         const val TEXT_DEF = ""
         const val CLICK_DEBOUNCE_DELAY = 1000L
