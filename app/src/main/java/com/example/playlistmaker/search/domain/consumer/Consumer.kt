@@ -4,5 +4,5 @@ import com.example.playlistmaker.search.domain.models.Resource
 import com.example.playlistmaker.search.domain.models.Track
 
 interface Consumer {
-    fun consume(tracks: Resource<List<Track>?>)
+    fun consume(foundTracks: Resource<List<Track>?>)
 }

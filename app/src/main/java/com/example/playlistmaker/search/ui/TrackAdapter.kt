@@ -1,9 +1,7 @@
 package com.example.playlistmaker.search.ui
 
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.playlistmaker.R
 import com.example.playlistmaker.search.domain.models.Track
 
 class TrackAdapter(
@@ -11,10 +9,8 @@ class TrackAdapter(
     private val onItemClick: (Track) -> Unit
 ) : RecyclerView.Adapter<TrackViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.rv_tracks, parent, false)
-        return TrackViewHolder(view)
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder =
+        TrackViewHolder.from(parent)
 
     override fun getItemCount(): Int {
         return tracks.size

@@ -3,7 +3,6 @@ package com.example.playlistmaker.player.ui
 import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,8 +10,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.playlistmaker.LocalUtils
-import com.example.playlistmaker.player.ui.model.PlayerState
-import com.example.playlistmaker.player.ui.model.PlayerStatus
+import com.example.playlistmaker.player.ui.models.PlayerState
+import com.example.playlistmaker.player.ui.models.PlayerStatus
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -26,7 +25,7 @@ class AudioPlayerViewModel(private val trackUrl: String?) : ViewModel() {
     private val timerRunnable = Runnable {
         val currentPosition = mediaPlayer.currentPosition
         playerStatusLiveData.value =
-            playerStatusLiveData.value?.copy(LocalUtils().dateFormat(currentPosition.toLong()))
+            playerStatusLiveData.value?.copy(timer = LocalUtils().dateFormat(currentPosition.toLong()))
         if (playerStatusLiveData.value?.isPlaying == true) {
             startTimerUpdate()
         }
@@ -50,19 +49,14 @@ class AudioPlayerViewModel(private val trackUrl: String?) : ViewModel() {
         when (playerStatusLiveData.value?.playerState) {
             PlayerState.STATE_PLAYING -> {
                 pausePlayer()
-                Log.d("MyTag", "play ${playerStatusLiveData.value?.playerState}")
             }
 
             PlayerState.STATE_PREPARED, PlayerState.STATE_PAUSED -> {
                 startPlayer()
-                Log.d("MyTag", "pause ${playerStatusLiveData.value?.playerState}")
             }
 
-            else -> {
-                Log.d("MyTag", "else ${playerStatusLiveData.value?.playerState}")
-            }
+            else -> {}
         }
-        Log.d("MyTag", "after when")
     }
 
     private fun preparePlayer() {
@@ -116,7 +110,7 @@ class AudioPlayerViewModel(private val trackUrl: String?) : ViewModel() {
 
     private fun startTimerUpdate() {
         timer = SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
-        handler.postDelayed(timerRunnable, DELAY_MILLIS)
+        handler.post(timerRunnable)
     }
 
     private fun pauseTimer() {
@@ -134,7 +128,5 @@ class AudioPlayerViewModel(private val trackUrl: String?) : ViewModel() {
                 AudioPlayerViewModel(trackUrl)
             }
         }
-
-        private const val DELAY_MILLIS = 400L
     }
 }

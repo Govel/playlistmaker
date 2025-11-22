@@ -2,7 +2,6 @@ package com.example.playlistmaker.player.ui
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -12,17 +11,14 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.LocalUtils
 import com.example.playlistmaker.R
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivityAudioplayerBinding
-import com.example.playlistmaker.player.ui.model.PlayerState
+import com.example.playlistmaker.player.ui.models.PlayerState
 import com.example.playlistmaker.search.domain.models.TAG_CURRENT_TRACK
 import com.example.playlistmaker.search.domain.models.Track
 
+
 class AudioPlayer : AppCompatActivity() {
-    private val mediaPlayerInteractor = Creator.provideMediaPlayerInteractor()
-
     private lateinit var currentTrack: Track
-
     private lateinit var binding: ActivityAudioplayerBinding
     private lateinit var viewModel: AudioPlayerViewModel
 
@@ -37,8 +33,6 @@ class AudioPlayer : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        Log.d("MyTag", "")
-
 
         binding.mtbArrowback.setNavigationOnClickListener { finish() }
         currentTrack = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -48,9 +42,10 @@ class AudioPlayer : AppCompatActivity() {
             intent.getParcelableExtra(TAG_CURRENT_TRACK)
         })!!
         viewModel =
-            ViewModelProvider(this, AudioPlayerViewModel.getFactory(currentTrack.previewUrl)).get(
-                AudioPlayerViewModel::class.java
-            )
+            ViewModelProvider(
+                owner = this,
+                factory = AudioPlayerViewModel.getFactory(currentTrack.previewUrl)
+            )[AudioPlayerViewModel::class.java            ]
         Glide.with(binding.main.context)
             .load(
                 currentTrack.getCoverArtwork()
@@ -83,14 +78,12 @@ class AudioPlayer : AppCompatActivity() {
         binding.tvPrimaryGenreTrackName.text = currentTrack.primaryGenreName ?: ""
         binding.tvTrackCountry.text = currentTrack.country ?: ""
         viewModel.observePlayerStatus().observe(this) {
-            Log.d("MyTag", "playerState: ${it.playerState}")
             setImageButtonPlay(it.playerState == PlayerState.STATE_PLAYING)
             enableButton(it.playerState != PlayerState.STATE_DEFAULT)
             binding.tvTrackTime.text = it.timer
 
         }
         binding.btPlay.setOnClickListener {
-            Log.d("MyTag", "clicked")
             viewModel.onPlayButtonClicked()
         }
     }

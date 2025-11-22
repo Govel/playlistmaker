@@ -2,9 +2,7 @@ package com.example.playlistmaker.creator
 
 import android.app.Application
 import android.content.Context
-import android.media.MediaPlayer
 import com.example.playlistmaker.App
-import com.example.playlistmaker.player.data.repository.MediaPlayerRepositoryImpl
 import com.example.playlistmaker.settings.data.NightModeRepositoryImpl
 import com.example.playlistmaker.search.data.repository.HistoryRepositoryImpl
 import com.example.playlistmaker.search.data.repository.TracksSearchRepositoryImpl
@@ -12,14 +10,15 @@ import com.example.playlistmaker.search.data.storages.local.SharedPrefsClient
 import com.example.playlistmaker.search.data.storages.local.SharedPrefsHistoryTracks
 import com.example.playlistmaker.search.data.storages.local.SharedPrefsNightMode
 import com.example.playlistmaker.search.data.storages.network.RetrofitNetworkClient
-import com.example.playlistmaker.player.domain.impl.MediaPlayerInteractorImpl
 import com.example.playlistmaker.settings.domain.impl.NightModeInteractorImpl
 import com.example.playlistmaker.search.domain.impl.TracksInteractorImpl
-import com.example.playlistmaker.player.domain.repository.MediaPlayerInteractor
-import com.example.playlistmaker.player.domain.repository.MediaPlayerRepository
 import com.example.playlistmaker.settings.domain.repository.NightModeRepository
 import com.example.playlistmaker.search.domain.repository.HistoryRepository
 import com.example.playlistmaker.search.domain.repository.TracksInteractor
+import com.example.playlistmaker.sharing.data.impl.ExternalNavigatorImpl
+import com.example.playlistmaker.sharing.domain.ExternalNavigator
+import com.example.playlistmaker.sharing.domain.SharingInteractor
+import com.example.playlistmaker.sharing.domain.SharingInteractorImpl
 import com.google.gson.Gson
 
 object Creator {
@@ -66,10 +65,11 @@ object Creator {
     fun provideTracksInteractor(key: String): TracksInteractor {
         return TracksInteractorImpl(getTracksRepositoryImpl(), getHistoryRepository(key))
     }
-    private fun getMediaPlayerRepository(): MediaPlayerRepository {
-        return MediaPlayerRepositoryImpl(MediaPlayer())
+    private fun getExternalNavigator(): ExternalNavigator {
+        return ExternalNavigatorImpl()
     }
-    fun provideMediaPlayerInteractor(): MediaPlayerInteractor {
-        return MediaPlayerInteractorImpl(getMediaPlayerRepository())
+    fun provideSharingInteractor(externalNavigator: ExternalNavigator): SharingInteractor {
+        return SharingInteractorImpl(getExternalNavigator(), getAppContext())
     }
+
 }

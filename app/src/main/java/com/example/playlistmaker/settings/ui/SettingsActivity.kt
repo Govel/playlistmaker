@@ -9,6 +9,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.R
+import com.example.playlistmaker.databinding.ActivitySettingsBinding
 import com.example.playlistmaker.settings.domain.repository.NightModeInteractor
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -16,11 +17,14 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var nightModeInteractor: NightModeInteractor
-
+    private lateinit var binding: ActivitySettingsBinding
     private lateinit var themeSwitcher: SwitchMaterial
+//    private lateinit var viewModel: SettingsViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -30,20 +34,16 @@ class SettingsActivity : AppCompatActivity() {
         materialToolbar.setNavigationOnClickListener {
             finish()
         }
-        val frameShare = findViewById<FrameLayout>(R.id.share)
-        frameShare.setOnClickListener { getFrameShare() }
-        val writeInSupport = findViewById<FrameLayout>(R.id.write_in_support)
-        writeInSupport.setOnClickListener { writeInSupport() }
-        val userAgreement = findViewById<FrameLayout>(R.id.user_agreement)
-        userAgreement.setOnClickListener { getUserAgreement() }
-        themeSwitcher = findViewById(R.id.themeSwitcher)
+        binding.share.setOnClickListener { getFrameShare() }
+        binding.writeInSupport.setOnClickListener { writeInSupport() }
+        binding.userAgreement.setOnClickListener { getUserAgreement() }
         nightModeInteractor = Creator.provideNightModeInteractor()
-        themeSwitcher.setOnClickListener { nightModeInteractor.switchMode(themeSwitcher.isChecked) }
+        themeSwitcher.setOnClickListener { nightModeInteractor.switchMode(binding.themeSwitcher.isChecked) }
     }
 
     override fun onResume() {
         super.onResume()
-        themeSwitcher.isChecked = nightModeInteractor.getSettingsValue()
+        binding.themeSwitcher.isChecked = nightModeInteractor.getSettingsValue()
     }
 
     fun getFrameShare() {
