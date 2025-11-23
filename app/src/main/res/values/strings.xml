@@ -22,4 +22,6 @@
     <string name="release_date">Год</string>
     <string name="primary_genre_name">Жанр</string>
     <string name="country">Страна</string>
+    <string name="e_mail" translatable="false">s.gorlov123@gmail.com</string>
+    <string name="timer" translatable="false">00:00</string>
 </resources>

@@ -48,7 +48,7 @@
             android:textSize="16sp" />
 
         <ImageView
-            android:id="@+id/search_clearIcon"
+            android:id="@+id/search_clear_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|center"
