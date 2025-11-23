@@ -23,7 +23,7 @@
             android:id="@+id/main"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:context=".presentation.audioplayer.AudioPlayer">
+            tools:context=".player.ui.AudioPlayer">
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/gl_left"
