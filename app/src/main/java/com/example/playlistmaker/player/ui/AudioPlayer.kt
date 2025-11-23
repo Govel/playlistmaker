@@ -35,12 +35,7 @@ class AudioPlayer : AppCompatActivity() {
         }
 
         binding.mtbArrowback.setNavigationOnClickListener { finish() }
-        currentTrack = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(TAG_CURRENT_TRACK, Track::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableExtra(TAG_CURRENT_TRACK)
-        })!!
+        currentTrack = getParcelableExtraCompat()
         viewModel =
             ViewModelProvider(
                 owner = this,
@@ -62,7 +57,7 @@ class AudioPlayer : AppCompatActivity() {
         binding.tvTrackName.text = currentTrack.trackName
         binding.tvArtistName.text = currentTrack.artistName
         binding.tvTrackTimeMillis.text = LocalUtils().dateFormat(currentTrack.trackTimeMillis)
-        binding.tvTrackTime.text = "00:00"
+        binding.tvTrackTime.text = getString(R.string.timer)
         if (currentTrack.collectionName.isNullOrEmpty()) {
             binding.groupAlbum.isVisible = false
         } else {
@@ -98,5 +93,14 @@ class AudioPlayer : AppCompatActivity() {
 
     private fun setImageButtonPlay(isPlaying: Boolean) {
         binding.btPlay.setImageResource(if (isPlaying) R.drawable.pause else R.drawable.play)
+    }
+
+    fun getParcelableExtraCompat(): Track {
+        return (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra(TAG_CURRENT_TRACK, Track::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra(TAG_CURRENT_TRACK)
+        })!!
     }
 }
