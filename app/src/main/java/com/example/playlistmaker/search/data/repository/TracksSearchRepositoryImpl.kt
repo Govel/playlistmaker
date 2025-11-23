@@ -13,15 +13,15 @@ class TracksSearchRepositoryImpl(private val networkClient: NetworkClient) : Tra
             is TracksSearchResponse if response.resultCount > 0 -> {
                 val tracksDtoList = response.results
                 val tracks = TracksSearchMapper.mapDtoListToDomain(tracksDtoList)
-                Resource(expression, tracks, "")
+                Resource(expression, tracks, "CONTENT")
             }
 
             is TracksSearchResponse if response.resultCount == 0 -> {
-                Resource(expression, null, "empty")
+                Resource(expression, null, "EMPTY")
             }
 
             else -> {
-                Resource(expression, null, "error")
+                Resource(expression, null, "ERROR")
             }
         }
 

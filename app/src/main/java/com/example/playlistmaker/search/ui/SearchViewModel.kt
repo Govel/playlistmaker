@@ -14,6 +14,7 @@ import com.example.playlistmaker.search.domain.consumer.Consumer
 import com.example.playlistmaker.search.domain.models.Resource
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.search.domain.repository.TracksInteractor
+import com.example.playlistmaker.search.ui.model.SearchMessage
 import kotlinx.coroutines.Runnable
 
 class SearchViewModel(
@@ -51,16 +52,16 @@ class SearchViewModel(
                     override fun consume(foundTracks: Resource<List<Track>?>) {
                         val tracks = mutableListOf<Track>()
                         val newSearchRunnable = Runnable {
-                            if (foundTracks.data != null && foundTracks.expression == newSearchText && foundTracks.message != "error") {
+                            if (foundTracks.data != null && foundTracks.expression == newSearchText && foundTracks.message != SearchMessage.ERROR.toString()) {
                                 tracks.clear()
                                 tracks.addAll(foundTracks.data)
                             }
                             when {
-                                tracks.isEmpty() && foundTracks.message == "empty" -> {
+                                tracks.isEmpty() && foundTracks.message == SearchMessage.EMPTY.toString() -> {
                                     renderState(SearchState.Empty(foundTracks.message))
                                 }
 
-                                tracks.isEmpty() && foundTracks.message == "error" -> {
+                                tracks.isEmpty() && foundTracks.message == SearchMessage.ERROR.toString() -> {
                                     renderState(SearchState.Error(foundTracks.message))
                                 }
 
