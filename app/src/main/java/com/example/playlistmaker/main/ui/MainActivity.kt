@@ -3,39 +3,49 @@ package com.example.playlistmaker.main.ui
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.playlistmaker.R
+import com.example.playlistmaker.databinding.ActivityMainBinding
 import com.example.playlistmaker.media.ui.MediaActivity
-import com.example.playlistmaker.settings.ui.SettingsActivity
 import com.example.playlistmaker.search.ui.SearchActivity
+import com.example.playlistmaker.settings.ui.SettingsActivity
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private val viewModel: MainViewModel by viewModels()
+
     @SuppressLint("ServiceCast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        val buttonSearch = findViewById<Button>(R.id.search_button)
-        buttonSearch.setOnClickListener {
-            val displaySearch = Intent(this, SearchActivity::class.java)
-            startActivity(displaySearch)
+        viewModel.observeDispatcher().observe(this) {
+            dispatcher(it)
         }
-        val buttonSettings = findViewById<Button>(R.id.settings_button)
-        buttonSettings.setOnClickListener {
-            val displaySettings = Intent(this, SettingsActivity::class.java)
-            startActivity(displaySettings)
+        binding.searchButton.setOnClickListener {
+            viewModel.dispatchSearch()
         }
-        val buttonMedia = findViewById<Button>(R.id.media_button)
-        buttonMedia.setOnClickListener {
-            val displayMedia = Intent(this, MediaActivity::class.java)
-            startActivity(displayMedia)
+        binding.settingsButton.setOnClickListener {
+            viewModel.dispatchMedia()
         }
+        binding.mediaButton.setOnClickListener {
+            viewModel.dispatchSettings()
+        }
+    }
+
+    private fun dispatcher(state: MainState) {
+        val intent = when (state) {
+            is MainState.DispatchSearch -> Intent(this, SearchActivity::class.java)
+            is MainState.DispatchMedia -> Intent(this, SettingsActivity::class.java)
+            is MainState.DispatchSettings -> Intent(this, MediaActivity::class.java)
+        }
+        startActivity(intent)
     }
 }

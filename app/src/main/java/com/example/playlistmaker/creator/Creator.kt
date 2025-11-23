@@ -12,14 +12,14 @@ import com.example.playlistmaker.search.data.storages.network.RetrofitNetworkCli
 import com.example.playlistmaker.search.domain.impl.TracksInteractorImpl
 import com.example.playlistmaker.search.domain.repository.HistoryRepository
 import com.example.playlistmaker.search.domain.repository.TracksInteractor
-import com.example.playlistmaker.settings.data.SettingsRepository
+import com.example.playlistmaker.settings.domain.repository.SettingsRepository
 import com.example.playlistmaker.settings.data.SettingsRepositoryImpl
 import com.example.playlistmaker.settings.domain.impl.SettingsInteractorImpl
 import com.example.playlistmaker.settings.domain.repository.SettingsInteractor
 import com.example.playlistmaker.sharing.data.impl.ExternalNavigatorImpl
-import com.example.playlistmaker.sharing.domain.ExternalNavigator
-import com.example.playlistmaker.sharing.domain.SharingInteractor
-import com.example.playlistmaker.sharing.domain.SharingInteractorImpl
+import com.example.playlistmaker.sharing.domain.repository.ExternalNavigator
+import com.example.playlistmaker.sharing.domain.repository.SharingInteractor
+import com.example.playlistmaker.sharing.domain.impl.SharingInteractorImpl
 import com.google.gson.Gson
 
 object Creator {
@@ -63,7 +63,7 @@ object Creator {
         return ExternalNavigatorImpl(getAppContext())
     }
     fun provideSharingInteractor(): SharingInteractor {
-        return SharingInteractorImpl(getExternalNavigator(), getAppContext())
+        return SharingInteractorImpl(getExternalNavigator())
     }
 
     private fun getSettingsRepository(key: String): SettingsRepository {

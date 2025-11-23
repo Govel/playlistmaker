@@ -19,7 +19,7 @@ import java.util.Locale
 class AudioPlayerViewModel(private val trackUrl: String?) : ViewModel() {
     private val mediaPlayer = MediaPlayer()
     private val handler = Handler(Looper.getMainLooper())
-    private var timer = "00:00"
+    private var timer = LocalUtils().dateFormat(0)
     private val playerStatusLiveData = MutableLiveData(PlayerStatus())
     fun observePlayerStatus(): LiveData<PlayerStatus> = playerStatusLiveData
     private val timerRunnable = Runnable {

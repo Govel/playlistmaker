@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlistmaker.search.data.storages.local.SharedPrefsClient
 import com.example.playlistmaker.settings.domain.model.ThemeSettings
+import com.example.playlistmaker.settings.domain.repository.SettingsRepository
 
 class SettingsRepositoryImpl(
     private val nightModePrefsClient: SharedPrefsClient<Boolean>,
