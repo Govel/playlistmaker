@@ -15,7 +15,7 @@ class SharedPrefsNightMode(
         return sharedPreferences.getBoolean(key, data)
     }
 
-    override fun clear(data: Boolean) {
+    override fun clear() {
         return sharedPreferences.edit { remove(key) }
     }
 

@@ -13,27 +13,27 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySearchBinding
-import com.example.playlistmaker.player.ui.AudioPlayer
+import com.example.playlistmaker.player.ui.AudioPlayerActivity
 import com.example.playlistmaker.search.domain.models.TAG_CURRENT_TRACK
 import com.example.playlistmaker.search.domain.models.Track
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchBinding
-    private var viewModel: SearchViewModel? = null
+    private val viewModel by viewModel<SearchViewModel>()
     private var editTextSaver: String = TEXT_DEF
     private val tracksSearch = ArrayList<Track>()
     private val tracksHistory = mutableListOf<Track>()
     private val handler = Handler(Looper.getMainLooper())
     private var adapter = TrackAdapter(tracksSearch) { clickedTrack ->
-        viewModel?.saveTrackToHistory(clickedTrack)
+        viewModel.saveTrackToHistory(clickedTrack)
         loadSearchHistory()
     }
     private var adapterHistory = TrackAdapter(tracksHistory) { clickedTrack ->
         if (clickDebounce()) {
-            viewModel?.saveTrackToHistory(clickedTrack)
+            viewModel.saveTrackToHistory(clickedTrack)
             loadSearchHistory()
         }
     }
@@ -44,8 +44,6 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        viewModel =
-            ViewModelProvider(this, SearchViewModel.getFactory())[SearchViewModel::class.java]
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
@@ -64,21 +62,21 @@ class SearchActivity : AppCompatActivity() {
 
         adapter = TrackAdapter(tracksSearch) { clickedTrack ->
             if (clickDebounce()) {
-                viewModel?.saveTrackToHistory(clickedTrack)
+                viewModel.saveTrackToHistory(clickedTrack)
                 loadSearchHistory()
-                val displayAudioPlayer = Intent(this, AudioPlayer::class.java)
-                displayAudioPlayer.putExtra(TAG_CURRENT_TRACK, clickedTrack)
-                startActivity(displayAudioPlayer)
+                val displayAudioPlayerActivity = Intent(this, AudioPlayerActivity::class.java)
+                displayAudioPlayerActivity.putExtra(TAG_CURRENT_TRACK, clickedTrack)
+                startActivity(displayAudioPlayerActivity)
             }
         }
 
         adapterHistory = TrackAdapter(tracksHistory) { clickedTrack ->
             if (clickDebounce()) {
-                viewModel?.saveTrackToHistory(clickedTrack)
+                viewModel.saveTrackToHistory(clickedTrack)
                 loadSearchHistory()
-                val displayAudioPlayer = Intent(this, AudioPlayer::class.java)
-                displayAudioPlayer.putExtra(TAG_CURRENT_TRACK, clickedTrack)
-                startActivity(displayAudioPlayer)
+                val displayAudioPlayerActivity = Intent(this, AudioPlayerActivity::class.java)
+                displayAudioPlayerActivity.putExtra(TAG_CURRENT_TRACK, clickedTrack)
+                startActivity(displayAudioPlayerActivity)
             }
         }
 
@@ -87,7 +85,7 @@ class SearchActivity : AppCompatActivity() {
 
 
 
-        viewModel?.observeStateSearch()?.observe(this) {
+        viewModel.observeStateSearch().observe(this) {
             render(it)
         }
 
@@ -111,7 +109,7 @@ class SearchActivity : AppCompatActivity() {
                 binding.llSearchHistory.isVisible = !binding.searchBar.hasFocus()
                 binding.searchClearIcon.isVisible = clearButtonVisibility(s)
 
-                viewModel?.searchDebounce(
+                viewModel.searchDebounce(
                     changedText = s?.toString() ?: ""
                 )
             }
@@ -124,7 +122,7 @@ class SearchActivity : AppCompatActivity() {
             binding.searchBar.addTextChangedListener(searchTextWatcher)
             binding.searchBar.setOnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    viewModel?.searchDebounce(binding.searchBar.text.toString())
+                    viewModel.searchDebounce(binding.searchBar.text.toString())
                 }
                 false
             }
@@ -135,8 +133,8 @@ class SearchActivity : AppCompatActivity() {
 
 
         binding.btSearchUpdate.setOnClickListener {
-            viewModel?.searchDebounce(binding.searchBar.text.toString())
-            viewModel?.observeStateSearch()?.observe(this) {
+            viewModel.searchDebounce(binding.searchBar.text.toString())
+            viewModel.observeStateSearch().observe(this) {
                 render(it)
             }
         }
@@ -151,7 +149,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         binding.btClearHistory.setOnClickListener {
-            viewModel?.clearHistory()
+            viewModel.clearHistory()
             tracksHistory.clear()
             adapterHistory.notifyDataSetChanged()
             binding.llSearchHistory.isVisible = false
@@ -236,7 +234,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun loadSearchHistory() {
-        val saved = viewModel?.loadTracksFromHistory()!!
+        val saved = viewModel.loadTracksFromHistory()
         tracksHistory.clear()
         tracksHistory.addAll(saved)
         adapterHistory.notifyDataSetChanged()

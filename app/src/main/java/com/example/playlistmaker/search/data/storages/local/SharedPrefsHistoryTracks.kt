@@ -15,7 +15,7 @@ class SharedPrefsHistoryTracks(
         return sharedPreferences.getString(key, data) ?: ""
     }
 
-    override fun clear(data: String) {
+    override fun clear() {
         sharedPreferences.edit { remove(key) }
     }
 }

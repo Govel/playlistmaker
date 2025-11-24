@@ -5,14 +5,17 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import com.example.playlistmaker.search.data.dto.NetworkResponse
 
-class RetrofitNetworkClient(private val context: Context) : NetworkClient {
+class RetrofitNetworkClient(
+    private val iTunesApi: ITunesApi,
+    private val context: Context
+) : NetworkClient {
 
     override fun doRequest(dto: String): NetworkResponse {
         if (!isConnected()) {
             return NetworkResponse().apply {resultCode = -1}
         }
         return try {
-            val resp = RetrofitClient.api.searchTracks(dto).execute()
+            val resp = iTunesApi.searchTracks(dto).execute()
             val body = resp.body() ?: NetworkResponse()
             body.apply { resultCode = resp.code() }
         } catch (ex: Exception) {

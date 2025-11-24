@@ -24,7 +24,7 @@ class HistoryRepositoryImpl(
     }
 
     override fun clearHistory() {
-        prefs.clear(KEY_TRACKS)
+        prefs.clear()
     }
 
     override fun saveAllTracksToHistory(tracks: List<Track>) {
@@ -43,7 +43,6 @@ class HistoryRepositoryImpl(
     }
 
     companion object {
-        private const val KEY_TRACKS = "tracks"
         private const val MAX_SIZE = 10
     }
 }

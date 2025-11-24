@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.util.LocalUtils
@@ -15,9 +14,12 @@ import com.example.playlistmaker.databinding.ActivityAudioplayerBinding
 import com.example.playlistmaker.player.ui.models.PlayerState
 import com.example.playlistmaker.search.domain.models.TAG_CURRENT_TRACK
 import com.example.playlistmaker.search.domain.models.Track
+import org.koin.android.ext.android.getKoin
+import org.koin.core.parameter.parametersOf
 
 
-class AudioPlayer : AppCompatActivity() {
+
+class AudioPlayerActivity : AppCompatActivity() {
     private lateinit var currentTrack: Track
     private lateinit var binding: ActivityAudioplayerBinding
     private lateinit var viewModel: AudioPlayerViewModel
@@ -36,11 +38,9 @@ class AudioPlayer : AppCompatActivity() {
 
         binding.mtbArrowback.setNavigationOnClickListener { finish() }
         currentTrack = getParcelableExtraCompat()
-        viewModel =
-            ViewModelProvider(
-                owner = this,
-                factory = AudioPlayerViewModel.getFactory(currentTrack.previewUrl)
-            )[AudioPlayerViewModel::class.java            ]
+        viewModel = getKoin().get {
+            parametersOf(currentTrack.previewUrl)
+        }
         Glide.with(binding.main.context)
             .load(
                 currentTrack.getCoverArtwork()
