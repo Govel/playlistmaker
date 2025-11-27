@@ -23,6 +23,12 @@ class PlaylistsFragment: Fragment() {
         _binding = FragmentPlaylistsBinding.inflate(inflater, container, false)
         return binding.root
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     companion object {
         fun newInstance() = PlaylistsFragment()
     }
