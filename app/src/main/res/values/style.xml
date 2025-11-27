@@ -56,7 +56,10 @@
         <item name="android:gravity">end</item>
         <item name="android:textColor">@color/yp_gray</item>
     </style>
-
+    <style name="TabLayout" parent="TextAppearance.Design.Tab">
+        <item name="textAllCaps">false</item>
+        <item name="android:textSize">16dp</item>
+    </style>
 
 
 </resources>
