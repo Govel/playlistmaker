@@ -17,5 +17,6 @@
     <color name="icon_placeholder_color">@color/icon_black</color>
     <color name="bt_bg_color_variant">@color/icon_black</color>
     <color name="bt_txt_color_variant">@color/yp_white</color>
-    <color name="black_white">@color/icon_black</color>
+    <color name="icon_black_white">@color/icon_black</color>
+    <color name="light_gray_to_white">@color/yp_light_gray</color>
 </resources>

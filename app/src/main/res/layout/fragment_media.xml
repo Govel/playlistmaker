@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/secondary_bg_color"
-    tools:context=".media.ui.MediaActivity">
+    tools:context=".media.ui.MediaFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/title_media_library"
@@ -16,7 +16,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/arrowback"
         app:title="@string/media_library"
         app:titleMarginStart="0dp"
         app:titleTextAppearance="@style/HeaderTextStyle" />

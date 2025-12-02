@@ -58,4 +58,16 @@
         <item name="android:textColor">@color/yp_gray</item>
     </style>
 
+    <style name="BottomNavTextActive">
+        <item name="android:textSize">12sp</item>
+        <item name="fontFamily">@font/ys_display_medium</item>
+        <item name="android:textColor">@color/colorOnPrimary</item>
+    </style>
+
+    <style name="BottomNavTextInactive">
+        <item name="android:textSize">12sp</item>
+        <item name="fontFamily">@font/ys_display_medium</item>
+        <item name="android:textColor">@color/yp_blue</item>
+    </style>
+
 </resources>

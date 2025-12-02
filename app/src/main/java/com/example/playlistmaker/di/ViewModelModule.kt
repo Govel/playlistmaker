@@ -1,6 +1,5 @@
 package com.example.playlistmaker.di
 
-import com.example.playlistmaker.main.ui.MainViewModel
 import com.example.playlistmaker.media.ui.FavoriteTracksViewModel
 import com.example.playlistmaker.media.ui.PlaylistsViewModel
 import com.example.playlistmaker.player.ui.AudioPlayerViewModel
@@ -19,9 +18,6 @@ val viewModelModule = module {
     }
     viewModel { (url: String) ->
         AudioPlayerViewModel(url)
-    }
-    viewModel {
-        MainViewModel()
     }
     viewModel {
         FavoriteTracksViewModel()
