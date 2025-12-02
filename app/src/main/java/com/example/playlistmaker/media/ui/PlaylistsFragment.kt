@@ -8,7 +8,8 @@ import androidx.fragment.app.Fragment
 import com.example.playlistmaker.databinding.FragmentPlaylistsBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class PlaylistsFragment: Fragment() {
+class
+PlaylistsFragment: Fragment() {
 
     private var _binding: FragmentPlaylistsBinding? = null
     private val binding get() = _binding!!
@@ -30,6 +31,7 @@ class PlaylistsFragment: Fragment() {
     }
 
     companion object {
+        const val TAG = "PlaylistsFragment"
         fun newInstance() = PlaylistsFragment()
     }
 }
