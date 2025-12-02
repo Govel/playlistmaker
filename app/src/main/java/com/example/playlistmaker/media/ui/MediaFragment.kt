@@ -40,11 +40,8 @@ class MediaFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        _binding = null
         super.onDestroyView()
         tabMediator.detach()
-    }
-
-    companion object {
-        const val TAG = "MediaFragment"
     }
 }

@@ -4,10 +4,12 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.fragment.app.commit
+import androidx.core.view.isVisible
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityRootBinding
-import com.example.playlistmaker.search.ui.SearchFragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
 class RootActivity : AppCompatActivity() {
@@ -23,9 +25,22 @@ class RootActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        if (savedInstanceState == null) {
-            supportFragmentManager.commit {
-                this.add(R.id.rootFragmentContainerView, SearchFragment())
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.rootFragmentContainerView) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        bottomNavigationView.setupWithNavController(navController)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.audioPlayerFragment -> {
+                    binding.bottomNavigationView.isVisible = false
+                    binding.separator.isVisible = false
+                }
+                else ->  {
+                    binding.bottomNavigationView.isVisible = true
+                    binding.separator.isVisible = true
+                }
             }
         }
     }

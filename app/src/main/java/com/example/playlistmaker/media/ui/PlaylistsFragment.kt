@@ -31,7 +31,6 @@ PlaylistsFragment: Fragment() {
     }
 
     companion object {
-        const val TAG = "PlaylistsFragment"
         fun newInstance() = PlaylistsFragment()
     }
 }

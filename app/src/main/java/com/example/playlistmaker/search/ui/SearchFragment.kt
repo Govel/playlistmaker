@@ -16,9 +16,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentSearchBinding
-import com.example.playlistmaker.player.ui.AudioPlayerFragment
 import com.example.playlistmaker.search.domain.models.Track
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -52,6 +50,11 @@ class SearchFragment : Fragment() {
         return binding.root
     }
 
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         savedInstanceState?.let {
@@ -65,10 +68,8 @@ class SearchFragment : Fragment() {
             if (clickDebounce()) {
                 viewModel.saveTrackToHistory(clickedTrack)
                 loadSearchHistory()
-                findNavController().navigate(
-                    R.id.action_searchFragment_to_audioPlayerFragment,
-                    AudioPlayerFragment.createArgs(clickedTrack)
-                )
+                val action = SearchFragmentDirections.actionSearchFragmentToAudioPlayerFragment(clickedTrack)
+                findNavController().navigate(action)
             }
         }
 
@@ -76,29 +77,8 @@ class SearchFragment : Fragment() {
             if (clickDebounce()) {
                 viewModel.saveTrackToHistory(clickedTrack)
                 loadSearchHistory()
-                findNavController().navigate(
-                    R.id.action_searchFragment_to_audioPlayerFragment,
-                    AudioPlayerFragment.createArgs(
-                        clickedTrack.trackId,
-                        clickedTrack.trackName,
-                        clickedTrack.artistName,
-                        clickedTrack.trackTimeMillis,
-                        clickedTrack.artworkUrl100,
-                        clickedTrack.previewUrl,
-                        clickedTrack.collectionName,
-                        clickedTrack.releaseDate,
-                        clickedTrack.primaryGenreName,
-                        clickedTrack.country
-                    )
-                )
-//                parentFragmentManager.commit {
-//                    replace(R.id.rootFragmentContainerView, AudioPlayerFragment.newInstance(
-//                        track = clickedTrack
-//                    ),
-//                        AudioPlayerFragment.TAG
-//                    )
-//                    addToBackStack(AudioPlayerFragment.TAG)
-//                }
+                val action = SearchFragmentDirections.actionSearchFragmentToAudioPlayerFragment(clickedTrack)
+                findNavController().navigate(action)
             }
         }
         binding.rvSearchResult.layoutManager =
@@ -107,8 +87,6 @@ class SearchFragment : Fragment() {
         binding.rvSearchHistory.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.rvSearchHistory.adapter = adapterHistory
-
-
 
         viewModel.observeStateSearch().observe(viewLifecycleOwner) {
             render(it)
@@ -268,6 +246,5 @@ class SearchFragment : Fragment() {
         const val EDIT_TEXT = "EDIT_TEXT"
         const val TEXT_DEF = ""
         const val CLICK_DEBOUNCE_DELAY = 1000L
-        const val TAG = "SearchFragment"
     }
 }
