@@ -51,8 +51,14 @@ class SearchFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        viewModel.cancelPendingSearch()
         _binding = null
         super.onDestroyView()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        renderHistoryIfNeeded()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -68,7 +74,8 @@ class SearchFragment : Fragment() {
             if (clickDebounce()) {
                 viewModel.saveTrackToHistory(clickedTrack)
                 loadSearchHistory()
-                val action = SearchFragmentDirections.actionSearchFragmentToAudioPlayerFragment(clickedTrack)
+                val action =
+                    SearchFragmentDirections.actionSearchFragmentToAudioPlayerFragment(clickedTrack)
                 findNavController().navigate(action)
             }
         }
@@ -77,7 +84,8 @@ class SearchFragment : Fragment() {
             if (clickDebounce()) {
                 viewModel.saveTrackToHistory(clickedTrack)
                 loadSearchHistory()
-                val action = SearchFragmentDirections.actionSearchFragmentToAudioPlayerFragment(clickedTrack)
+                val action =
+                    SearchFragmentDirections.actionSearchFragmentToAudioPlayerFragment(clickedTrack)
                 findNavController().navigate(action)
             }
         }
@@ -92,20 +100,16 @@ class SearchFragment : Fragment() {
             render(it)
         }
 
-        if (binding.searchBar.text.isEmpty()) {
-            if (tracksHistory.isNotEmpty()) {
-                showHistory()
-            } else {
-                binding.llSearchHistory.isVisible = false
-            }
-        }
-
         val searchTextWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                binding.llSearchHistory.isVisible = !binding.searchBar.hasFocus()
+                if (s.isNullOrEmpty()) {
+                    renderHistoryIfNeeded()
+                } else {
+                    binding.llSearchHistory.isVisible = false
+                }
                 binding.searchClearIcon.isVisible = clearButtonVisibility(s)
 
                 viewModel.searchDebounce(
@@ -130,12 +134,8 @@ class SearchFragment : Fragment() {
             }
         }
 
-
         binding.btSearchUpdate.setOnClickListener {
             viewModel.searchDebounce(binding.searchBar.text.toString())
-            viewModel.observeStateSearch().observe(viewLifecycleOwner) {
-                render(it)
-            }
         }
 
         binding.searchClearIcon.setOnClickListener {
@@ -182,7 +182,6 @@ class SearchFragment : Fragment() {
         binding.searchIsEmpty.isVisible = false
         binding.searchNoInternet.isVisible = false
         binding.pbSearch.isVisible = false
-
     }
 
     private fun showEmptyResults() {
@@ -206,8 +205,6 @@ class SearchFragment : Fragment() {
     }
 
     private fun showHistory() {
-        tracksSearch.clear()
-        adapter.notifyDataSetChanged()
         loadSearchHistory()
         binding.rvSearchResult.isVisible = false
         binding.searchIsEmpty.isVisible = false
@@ -233,12 +230,36 @@ class SearchFragment : Fragment() {
         binding.llSearchHistory.isVisible = tracksHistory.isNotEmpty()
     }
 
+    private fun showStandBy() {
+        binding.rvSearchResult.isVisible = false
+        binding.searchIsEmpty.isVisible = false
+        binding.searchNoInternet.isVisible = false
+        binding.pbSearch.isVisible = false
+        renderHistoryIfNeeded()
+    }
+
     fun render(state: SearchState) {
+        val query = binding.searchBar.text?.toString().orEmpty()
+        if (query.isEmpty()) {
+            showStandBy()
+            return
+        }
         when (state) {
+            is SearchState.StandBy -> showStandBy()
             is SearchState.Loading -> showProgressBar()
             is SearchState.Content -> showContent(state.tracks)
             is SearchState.Error -> showNetworkError()
             is SearchState.Empty -> showEmptyResults()
+        }
+    }
+
+    private fun renderHistoryIfNeeded() {
+        val query = binding.searchBar.text?.toString().orEmpty()
+        if (query.isEmpty()) {
+            loadSearchHistory()
+            binding.llSearchHistory.isVisible = tracksHistory.isNotEmpty()
+        } else {
+            binding.llSearchHistory.isVisible = false
         }
     }
 

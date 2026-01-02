@@ -63,7 +63,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="gone" />
+        android:visibility="gone"
+        tools:listitem="@layout/rv_tracks" />
 
     <LinearLayout
         android:id="@+id/search_is_empty"
@@ -168,7 +169,8 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingTop="8dp" />
+            android:paddingTop="8dp"
+            tools:listitem="@layout/rv_tracks" />
 
         <Button
             android:id="@+id/bt_clear_history"
