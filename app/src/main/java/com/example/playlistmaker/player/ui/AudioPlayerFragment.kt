@@ -1,58 +1,61 @@
 package com.example.playlistmaker.player.ui
 
-import android.os.Build
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.playlistmaker.util.LocalUtils
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivityAudioplayerBinding
+import com.example.playlistmaker.databinding.FragmentAudioPlayerBinding
 import com.example.playlistmaker.player.ui.models.PlayerState
-import com.example.playlistmaker.search.domain.models.TAG_CURRENT_TRACK
 import com.example.playlistmaker.search.domain.models.Track
+import com.example.playlistmaker.util.LocalUtils
 import org.koin.android.ext.android.getKoin
 import org.koin.core.parameter.parametersOf
 
+class AudioPlayerFragment : Fragment() {
+    private var _binding: FragmentAudioPlayerBinding? = null
+    private val binding get() = _binding!!
 
-
-class AudioPlayerActivity : AppCompatActivity() {
+    private val args: AudioPlayerFragmentArgs by navArgs()
+    private val track: Track get() = args.currentTrack
     private lateinit var currentTrack: Track
-    private lateinit var binding: ActivityAudioplayerBinding
+
     private lateinit var viewModel: AudioPlayerViewModel
 
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentAudioPlayerBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityAudioplayerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
+    }
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.start)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.mtbArrowback.setNavigationOnClickListener {
+            findNavController().navigateUp()
         }
-
-        binding.mtbArrowback.setNavigationOnClickListener { finish() }
-        currentTrack = getParcelableExtraCompat()
+        currentTrack = track
         viewModel = getKoin().get {
             parametersOf(currentTrack.previewUrl)
         }
-        Glide.with(binding.main.context)
-            .load(
-                currentTrack.getCoverArtwork()
+        Glide.with(binding.main.context).load(
+            currentTrack.getCoverArtwork()
+        ).placeholder(R.drawable.placeholder_cover).fitCenter().transform(
+            RoundedCorners(
+                LocalUtils().dpToPx(8.0f, binding.main)
             )
-            .placeholder(R.drawable.placeholder_cover)
-            .fitCenter()
-            .transform(
-                RoundedCorners(
-                    LocalUtils().dpToPx(8.0f, binding.main)
-                )
-            )
-            .into(binding.ivArtwork)
+        ).into(binding.ivArtwork)
 
         binding.tvTrackName.text = currentTrack.trackName
         binding.tvArtistName.text = currentTrack.artistName
@@ -72,7 +75,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         }
         binding.tvPrimaryGenreTrackName.text = currentTrack.primaryGenreName ?: ""
         binding.tvTrackCountry.text = currentTrack.country ?: ""
-        viewModel.observePlayerStatus().observe(this) {
+        viewModel.observePlayerStatus().observe(viewLifecycleOwner) {
             setImageButtonPlay(it.playerState == PlayerState.STATE_PLAYING)
             enableButton(it.playerState != PlayerState.STATE_DEFAULT)
             binding.tvTrackTime.text = it.timer
@@ -93,14 +96,5 @@ class AudioPlayerActivity : AppCompatActivity() {
 
     private fun setImageButtonPlay(isPlaying: Boolean) {
         binding.btPlay.setImageResource(if (isPlaying) R.drawable.pause else R.drawable.play)
-    }
-
-    fun getParcelableExtraCompat(): Track {
-        return (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(TAG_CURRENT_TRACK, Track::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableExtra(TAG_CURRENT_TRACK)
-        })!!
     }
 }

@@ -6,9 +6,6 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.playlistmaker.util.LocalUtils
 import com.example.playlistmaker.player.ui.models.PlayerState
 import com.example.playlistmaker.player.ui.models.PlayerStatus
@@ -110,6 +107,7 @@ class AudioPlayerViewModel(private val trackUrl: String?) : ViewModel() {
 
     private fun startTimerUpdate() {
         timer = SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
+        handler.removeCallbacks(timerRunnable)
         handler.post(timerRunnable)
     }
 
@@ -120,13 +118,5 @@ class AudioPlayerViewModel(private val trackUrl: String?) : ViewModel() {
     private fun resetTimer() {
         handler.removeCallbacks(timerRunnable)
         playerStatusLiveData.postValue(PlayerStatus("00:00", PlayerState.STATE_PREPARED))
-    }
-
-    companion object {
-        fun getFactory(trackUrl: String?): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                AudioPlayerViewModel(trackUrl)
-            }
-        }
     }
 }

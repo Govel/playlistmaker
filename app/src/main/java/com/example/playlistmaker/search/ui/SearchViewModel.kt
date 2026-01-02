@@ -77,6 +77,12 @@ class SearchViewModel(
         stateSearchLiveData.postValue(state)
     }
 
+    fun cancelPendingSearch() {
+        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
+        searchRunnable?.let { handler.removeCallbacks(it) }
+        searchRunnable = null
+    }
+
     override fun onCleared() {
         super.onCleared()
         handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
@@ -89,8 +95,6 @@ class SearchViewModel(
     fun loadTracksFromHistory(): Collection<Track> = tracksInteractor.loadTracksFromHistory()
 
     companion object {
-
-
         const val SEARCH_DEBOUNCE_DELAY = 2000L
         private val SEARCH_REQUEST_TOKEN = Any()
     }
