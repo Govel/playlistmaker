@@ -12,7 +12,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentAudioPlayerBinding
-import com.example.playlistmaker.player.ui.models.PlayerState
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.util.LocalUtils
 import org.koin.android.ext.android.getKoin
@@ -76,9 +75,9 @@ class AudioPlayerFragment : Fragment() {
         binding.tvPrimaryGenreTrackName.text = currentTrack.primaryGenreName ?: ""
         binding.tvTrackCountry.text = currentTrack.country ?: ""
         viewModel.observePlayerStatus().observe(viewLifecycleOwner) {
-            setImageButtonPlay(it.playerState == PlayerState.STATE_PLAYING)
-            enableButton(it.playerState != PlayerState.STATE_DEFAULT)
-            binding.tvTrackTime.text = it.timer
+            setImageButtonPlay(it.buttonText)
+            enableButton(it.isPlayButtonEnabled)
+            binding.tvTrackTime.text = it.progress
         }
         binding.btPlay.setOnClickListener {
             viewModel.onPlayButtonClicked()
@@ -94,7 +93,7 @@ class AudioPlayerFragment : Fragment() {
         binding.btPlay.isEnabled = isEnabled
     }
 
-    private fun setImageButtonPlay(isPlaying: Boolean) {
-        binding.btPlay.setImageResource(if (isPlaying) R.drawable.pause else R.drawable.play)
+    private fun setImageButtonPlay(buttonText: String) {
+        binding.btPlay.setImageResource(if (buttonText == "PAUSE") R.drawable.pause else R.drawable.play)
     }
 }
