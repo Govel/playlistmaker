@@ -1,7 +1,6 @@
 package com.example.playlistmaker.player.ui
 
 import android.media.MediaPlayer
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -106,11 +105,9 @@ class AudioPlayerViewModel(private val trackUrl: String?) : ViewModel() {
         }
     }
 
-
     private fun getCurrentPlayerPosition(): String {
         return SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
             ?: "00:00"
-
     }
 
     companion object {

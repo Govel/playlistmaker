@@ -5,7 +5,6 @@ import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -54,7 +53,6 @@ class SearchFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        viewModel.cancelPendingSearch()
         _binding = null
         super.onDestroyView()
     }

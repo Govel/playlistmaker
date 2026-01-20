@@ -1,13 +1,12 @@
 package com.example.playlistmaker.search.domain.impl
 
-import com.example.playlistmaker.search.domain.consumer.Consumer
+import com.example.playlistmaker.search.domain.models.Resource
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.search.domain.repository.HistoryRepository
 import com.example.playlistmaker.search.domain.repository.TracksInteractor
 import com.example.playlistmaker.search.domain.repository.TracksRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import java.util.concurrent.Executors
 
 class TracksInteractorImpl(
     private val trackRepository: TracksRepository,
@@ -16,11 +15,16 @@ class TracksInteractorImpl(
     override fun searchTracks(
         expression: String
     ) : Flow<Pair<List<Track>?, String?>> {
-        executor.execute {
-            consumer.consume(trackRepository.searchTracks(expression))
-        }
-        return trackRepository.searchTracks(expression).map {
+        return trackRepository.searchTracks(expression).map { result ->
+            when (result) {
+                is Resource.Success -> {
+                    Pair(result.data, null)
+                }
 
+                is Resource.Error -> {
+                    Pair(null, result.message)
+                }
+            }
         }
     }
 
