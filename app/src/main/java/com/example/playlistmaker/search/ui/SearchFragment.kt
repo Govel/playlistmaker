@@ -32,8 +32,10 @@ class SearchFragment : Fragment() {
     private val tracksHistory = mutableListOf<Track>()
 
     private var adapter = TrackAdapter(tracksSearch) { clickedTrack ->
-        viewModel.saveTrackToHistory(clickedTrack)
-        loadSearchHistory()
+        if (clickDebounce()) {
+            viewModel.saveTrackToHistory(clickedTrack)
+            loadSearchHistory()
+        }
     }
     private var adapterHistory = TrackAdapter(tracksHistory) { clickedTrack ->
         if (clickDebounce()) {

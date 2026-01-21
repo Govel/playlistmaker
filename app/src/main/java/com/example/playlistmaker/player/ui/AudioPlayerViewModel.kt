@@ -17,7 +17,7 @@ class AudioPlayerViewModel(private val trackUrl: String?) : ViewModel() {
     private val mediaPlayer = MediaPlayer()
     private var timerJob: Job? = null
     private val playerStateLiveData = MutableLiveData<PlayerState>(PlayerState.Default())
-    fun observePlayerStatus(): LiveData<PlayerState> = playerStateLiveData
+    fun observePlayerState(): LiveData<PlayerState> = playerStateLiveData
 
     init {
         preparePlayer()
@@ -47,7 +47,6 @@ class AudioPlayerViewModel(private val trackUrl: String?) : ViewModel() {
     }
 
     private fun preparePlayer() {
-        mediaPlayer.seekTo(0)
         mediaPlayer.setDataSource(trackUrl)
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
@@ -109,6 +108,7 @@ class AudioPlayerViewModel(private val trackUrl: String?) : ViewModel() {
         return SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
             ?: "00:00"
     }
+
 
     companion object {
         const val TIMER_UPDATE_DELAY = 300L

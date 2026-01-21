@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentAudioPlayerBinding
+import com.example.playlistmaker.player.ui.models.PlayerState
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.util.LocalUtils
 import org.koin.android.ext.android.getKoin
@@ -74,7 +75,8 @@ class AudioPlayerFragment : Fragment() {
         }
         binding.tvPrimaryGenreTrackName.text = currentTrack.primaryGenreName ?: ""
         binding.tvTrackCountry.text = currentTrack.country ?: ""
-        viewModel.observePlayerStatus().observe(viewLifecycleOwner) {
+        viewModel.observePlayerState().observe(viewLifecycleOwner) {
+            render(it)
             setImageButtonPlay(it.buttonText)
             enableButton(it.isPlayButtonEnabled)
             binding.tvTrackTime.text = it.progress
@@ -95,5 +97,19 @@ class AudioPlayerFragment : Fragment() {
 
     private fun setImageButtonPlay(buttonText: String) {
         binding.btPlay.setImageResource(if (buttonText == "PAUSE") R.drawable.pause else R.drawable.play)
+    }
+    fun render(state: PlayerState) {
+        when (state) {
+            is PlayerState.Default -> showProgressBar()
+            else -> showContent()
+        }
+    }
+    private fun showProgressBar() {
+        binding.svPlayer.isVisible = false
+        binding.pbPlayer.isVisible = true
+    }
+    private fun showContent() {
+        binding.svPlayer.isVisible = true
+        binding.pbPlayer.isVisible = false
     }
 }
