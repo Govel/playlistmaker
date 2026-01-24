@@ -4,22 +4,25 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import com.example.playlistmaker.search.data.dto.NetworkResponse
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
 
 class RetrofitNetworkClient(
     private val iTunesApi: ITunesApi,
     private val context: Context
 ) : NetworkClient {
 
-    override fun doRequest(dto: String): NetworkResponse {
+    override suspend fun doRequest(dto: String): NetworkResponse {
         if (!isConnected()) {
             return NetworkResponse().apply {resultCode = -1}
         }
-        return try {
-            val resp = iTunesApi.searchTracks(dto).execute()
-            val body = resp.body() ?: NetworkResponse()
-            body.apply { resultCode = resp.code() }
-        } catch (ex: Exception) {
-            NetworkResponse().apply { resultCode = 400 }
+        return withContext(Dispatchers.IO) {
+            try {
+                val resp = iTunesApi.searchTracks(dto)
+                resp.apply { resultCode = 200 }
+            } catch (ex: Exception) {
+                NetworkResponse().apply { resultCode = 400 }
+            }
         }
     }
     private fun isConnected(): Boolean {

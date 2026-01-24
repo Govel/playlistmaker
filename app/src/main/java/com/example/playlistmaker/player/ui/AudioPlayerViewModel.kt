@@ -1,32 +1,23 @@
 package com.example.playlistmaker.player.ui
 
 import android.media.MediaPlayer
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.playlistmaker.util.LocalUtils
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.player.ui.models.PlayerState
-import com.example.playlistmaker.player.ui.models.PlayerStatus
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 
 class AudioPlayerViewModel(private val trackUrl: String?) : ViewModel() {
     private val mediaPlayer = MediaPlayer()
-    private val handler = Handler(Looper.getMainLooper())
-    private var timer = LocalUtils().dateFormat(0)
-    private val playerStatusLiveData = MutableLiveData(PlayerStatus())
-    fun observePlayerStatus(): LiveData<PlayerStatus> = playerStatusLiveData
-    private val timerRunnable = Runnable {
-        val currentPosition = mediaPlayer.currentPosition
-        playerStatusLiveData.value =
-            playerStatusLiveData.value?.copy(timer = LocalUtils().dateFormat(currentPosition.toLong()))
-        if (playerStatusLiveData.value?.isPlaying == true) {
-            startTimerUpdate()
-        }
-    }
+    private var timerJob: Job? = null
+    private val playerStateLiveData = MutableLiveData<PlayerState>(PlayerState.Default())
+    fun observePlayerState(): LiveData<PlayerState> = playerStateLiveData
 
     init {
         preparePlayer()
@@ -38,17 +29,16 @@ class AudioPlayerViewModel(private val trackUrl: String?) : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        mediaPlayer.release()
-        resetTimer()
+        releasePlayer()
     }
 
     fun onPlayButtonClicked() {
-        when (playerStatusLiveData.value?.playerState) {
-            PlayerState.STATE_PLAYING -> {
+        when (playerStateLiveData.value) {
+            is PlayerState.Playing -> {
                 pausePlayer()
             }
 
-            PlayerState.STATE_PREPARED, PlayerState.STATE_PAUSED -> {
+            is PlayerState.Prepared, is PlayerState.Paused -> {
                 startPlayer()
             }
 
@@ -60,63 +50,67 @@ class AudioPlayerViewModel(private val trackUrl: String?) : ViewModel() {
         mediaPlayer.setDataSource(trackUrl)
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
-            playerStatusLiveData.postValue(
-                PlayerStatus(
-                    timer = timer,
-                    playerState = PlayerState.STATE_PREPARED,
-                    isPrepared = true
-                )
+            playerStateLiveData.postValue(
+                PlayerState.Prepared()
             )
         }
         mediaPlayer.setOnCompletionListener {
-            playerStatusLiveData.postValue(
-                PlayerStatus(
-                    timer = timer,
-                    playerState = PlayerState.STATE_PREPARED,
-                    isPrepared = true
-                )
+            timerJob?.cancel()
+            playerStateLiveData.postValue(
+                PlayerState.Prepared()
             )
-            resetTimer()
         }
     }
 
     private fun startPlayer() {
+        if (playerStateLiveData.value is PlayerState.Prepared) {
+            mediaPlayer.seekTo(0)
+        }
         mediaPlayer.start()
-        playerStatusLiveData.postValue(
-            PlayerStatus(
-                timer = playerStatusLiveData.value?.timer ?: "00:00",
-                playerState = PlayerState.STATE_PLAYING,
-                isPlaying = true,
-                isPrepared = true
-            )
+        playerStateLiveData.postValue(
+            PlayerState.Playing(getCurrentPlayerPosition())
         )
         startTimerUpdate()
     }
 
     private fun pausePlayer() {
-        pauseTimer()
         mediaPlayer.pause()
-        playerStatusLiveData.postValue(
-            PlayerStatus(
-                timer = playerStatusLiveData.value?.timer ?: "00:00",
-                playerState = PlayerState.STATE_PAUSED,
-                isPrepared = true
-            )
+        timerJob?.cancel()
+        playerStateLiveData.postValue(
+            PlayerState.Paused(getCurrentPlayerPosition())
         )
     }
 
+    private fun releasePlayer() {
+        timerJob?.cancel()
+
+        if (mediaPlayer.isPlaying) {
+            mediaPlayer.stop()
+        }
+
+        mediaPlayer.release()
+        playerStateLiveData.value = PlayerState.Default()
+    }
+
     private fun startTimerUpdate() {
-        timer = SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
-        handler.removeCallbacks(timerRunnable)
-        handler.post(timerRunnable)
+        timerJob = viewModelScope.launch {
+            while (true) {
+                delay(TIMER_UPDATE_DELAY)
+                if (mediaPlayer.isPlaying) {
+                    if (playerStateLiveData.value is PlayerState.Playing)
+                        playerStateLiveData.postValue(PlayerState.Playing(getCurrentPlayerPosition()))
+                }
+            }
+        }
     }
 
-    private fun pauseTimer() {
-        handler.removeCallbacks(timerRunnable)
+    private fun getCurrentPlayerPosition(): String {
+        return SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
+            ?: "00:00"
     }
 
-    private fun resetTimer() {
-        handler.removeCallbacks(timerRunnable)
-        playerStatusLiveData.postValue(PlayerStatus("00:00", PlayerState.STATE_PREPARED))
+
+    companion object {
+        const val TIMER_UPDATE_DELAY = 300L
     }
 }

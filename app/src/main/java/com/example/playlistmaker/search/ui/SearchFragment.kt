@@ -3,8 +3,6 @@ package com.example.playlistmaker.search.ui
 
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -14,24 +12,30 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.search.domain.models.Track
+import com.example.playlistmaker.util.debounce
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
-
+    private lateinit var onTrackClickDebounce: (Track) -> Unit
     private val viewModel by viewModel<SearchViewModel>()
     private var editTextSaver: String = TEXT_DEF
     private val tracksSearch = ArrayList<Track>()
     private val tracksHistory = mutableListOf<Track>()
-    private val handler = Handler(Looper.getMainLooper())
+
     private var adapter = TrackAdapter(tracksSearch) { clickedTrack ->
-        viewModel.saveTrackToHistory(clickedTrack)
-        loadSearchHistory()
+        if (clickDebounce()) {
+            viewModel.saveTrackToHistory(clickedTrack)
+            loadSearchHistory()
+        }
     }
     private var adapterHistory = TrackAdapter(tracksHistory) { clickedTrack ->
         if (clickDebounce()) {
@@ -51,7 +55,6 @@ class SearchFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        viewModel.cancelPendingSearch()
         _binding = null
         super.onDestroyView()
     }
@@ -63,6 +66,16 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        onTrackClickDebounce = debounce<Track>(
+            CLICK_DEBOUNCE_DELAY,
+            viewLifecycleOwner.lifecycleScope,
+            false
+        ) { clickedTrack ->
+            viewModel.saveTrackToHistory(clickedTrack)
+            loadSearchHistory()
+        }
+
         savedInstanceState?.let {
             val savedText = it.getString(EDIT_TEXT, TEXT_DEF)
             binding.searchBar.setText(savedText)
@@ -168,7 +181,10 @@ class SearchFragment : Fragment() {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
-            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+            lifecycleScope.launch {
+                delay(CLICK_DEBOUNCE_DELAY)
+                isClickAllowed = true
+            }
         }
         return current
     }

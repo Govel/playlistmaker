@@ -16,9 +16,26 @@
         android:background="@android:color/transparent"
         app:navigationIcon="@drawable/arrowback" />
 
+    <FrameLayout
+        android:id="@+id/pb_player"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_gravity="center|top"
+            android:layout_marginTop="140dp"
+            android:indeterminateTint="@color/yp_blue" />
+
+    </FrameLayout>
+
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:id="@+id/sv_player">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/main"

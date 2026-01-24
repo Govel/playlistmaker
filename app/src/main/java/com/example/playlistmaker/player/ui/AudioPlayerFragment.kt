@@ -75,10 +75,11 @@ class AudioPlayerFragment : Fragment() {
         }
         binding.tvPrimaryGenreTrackName.text = currentTrack.primaryGenreName ?: ""
         binding.tvTrackCountry.text = currentTrack.country ?: ""
-        viewModel.observePlayerStatus().observe(viewLifecycleOwner) {
-            setImageButtonPlay(it.playerState == PlayerState.STATE_PLAYING)
-            enableButton(it.playerState != PlayerState.STATE_DEFAULT)
-            binding.tvTrackTime.text = it.timer
+        viewModel.observePlayerState().observe(viewLifecycleOwner) {
+            render(it)
+            setImageButtonPlay(it.buttonText)
+            enableButton(it.isPlayButtonEnabled)
+            binding.tvTrackTime.text = it.progress
         }
         binding.btPlay.setOnClickListener {
             viewModel.onPlayButtonClicked()
@@ -94,7 +95,21 @@ class AudioPlayerFragment : Fragment() {
         binding.btPlay.isEnabled = isEnabled
     }
 
-    private fun setImageButtonPlay(isPlaying: Boolean) {
-        binding.btPlay.setImageResource(if (isPlaying) R.drawable.pause else R.drawable.play)
+    private fun setImageButtonPlay(buttonText: String) {
+        binding.btPlay.setImageResource(if (buttonText == "PAUSE") R.drawable.pause else R.drawable.play)
+    }
+    fun render(state: PlayerState) {
+        when (state) {
+            is PlayerState.Default -> showProgressBar()
+            else -> showContent()
+        }
+    }
+    private fun showProgressBar() {
+        binding.svPlayer.isVisible = false
+        binding.pbPlayer.isVisible = true
+    }
+    private fun showContent() {
+        binding.svPlayer.isVisible = true
+        binding.pbPlayer.isVisible = false
     }
 }
