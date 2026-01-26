@@ -1,6 +1,8 @@
 package com.example.playlistmaker.di
 
 import android.content.Context
+import androidx.room.Room
+import com.example.playlistmaker.db.data.AppDatabase
 import com.example.playlistmaker.search.data.storages.local.SharedPrefsClient
 import com.example.playlistmaker.search.data.storages.local.SharedPrefsHistoryTracks
 import com.example.playlistmaker.search.data.storages.local.SharedPrefsNightMode
@@ -30,6 +32,10 @@ val dataModule = module {
     }
 
     factory { Gson() }
+
+    single {
+        Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
+    }
 
     single<NetworkClient> {
         RetrofitNetworkClient(get(), androidContext())

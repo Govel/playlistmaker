@@ -1,5 +1,7 @@
 package com.example.playlistmaker.di
 
+import com.example.playlistmaker.db.data.repository.FavoriteTrackRepositoryImpl
+import com.example.playlistmaker.db.domain.api.FavoriteTrackRepository
 import com.example.playlistmaker.search.data.repository.HistoryRepositoryImpl
 import com.example.playlistmaker.search.data.repository.TracksSearchRepositoryImpl
 import com.example.playlistmaker.search.data.storages.local.SharedPrefsClient
@@ -23,5 +25,8 @@ val repositoryModule = module {
     }
     single<ExternalNavigator> {
         ExternalNavigatorImpl(get())
+    }
+    single<FavoriteTrackRepository> {
+        FavoriteTrackRepositoryImpl(get(), get())
     }
 }

@@ -30,7 +30,6 @@ class FavoriteTracksFragment : Fragment() {
     }
 
     companion object {
-        const val TAG = "FavoriteTracksFragment"
         fun newInstance() = FavoriteTracksFragment()
     }
 }

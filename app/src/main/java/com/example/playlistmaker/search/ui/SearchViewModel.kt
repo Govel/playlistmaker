@@ -1,9 +1,11 @@
 package com.example.playlistmaker.search.ui
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.db.domain.api.FavoriteTrackInteractor
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.search.domain.repository.TracksInteractor
 import com.example.playlistmaker.search.ui.model.SearchMessage
@@ -11,7 +13,8 @@ import com.example.playlistmaker.util.debounce
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
-    private val tracksInteractor: TracksInteractor
+    private val tracksInteractor: TracksInteractor,
+    private val favoriteTrackInteractor: FavoriteTrackInteractor
 ) : ViewModel() {
     private val stateSearchLiveData = MutableLiveData<SearchState>()
     fun observeStateSearch(): LiveData<SearchState> = stateSearchLiveData
@@ -46,6 +49,13 @@ class SearchViewModel(
         val tracks = mutableListOf<Track>()
         if (foundTracks != null) {
             tracks.addAll(foundTracks)
+            viewModelScope.launch {
+                favoriteTrackInteractor
+                    .getFavoriteTrackId()
+                    .collect { favoriteTracks ->
+                        favoriteTrackProcessResult(favoriteTracks, tracks)
+                    }
+            }
         }
         when {
             tracks.isEmpty() && errorMessage == SearchMessage.EMPTY.toString() -> {
@@ -62,6 +72,21 @@ class SearchViewModel(
         }
     }
 
+    private fun favoriteTrackProcessResult(favoriteTracks: List<Track>, tracks: List<Track>) {
+        if (favoriteTracks.isNotEmpty()) {
+            favoriteTracks.forEach { favoriteTrack ->
+                tracks.forEach { track ->
+                    if (track.trackId == favoriteTrack.trackId) {
+                        Log.d("MyTag", "favoriteTrack: $favoriteTrack")
+                        Log.d("MyTag", "track: $track")
+                        track.isFavorite = true
+                        Log.d("MyTag", "track: ${track.isFavorite}")
+                    }
+                }
+            }
+        }
+    }
+
     private fun renderState(state: SearchState) {
         stateSearchLiveData.postValue(state)
     }
@@ -70,7 +95,17 @@ class SearchViewModel(
 
     fun clearHistory() = tracksInteractor.clearHistory()
 
-    fun loadTracksFromHistory(): Collection<Track> = tracksInteractor.loadTracksFromHistory()
+    fun loadTracksFromHistory(): List<Track> {
+        val tracks = tracksInteractor.loadTracksFromHistory()
+        viewModelScope.launch {
+            favoriteTrackInteractor
+                .getFavoriteTrackId()
+                .collect { favoriteTracks ->
+                    favoriteTrackProcessResult(favoriteTracks, tracks)
+                }
+        }
+        return tracks
+    }
 
     companion object {
         const val SEARCH_DEBOUNCE_DELAY = 2000L

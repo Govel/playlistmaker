@@ -5,15 +5,22 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.db.domain.api.FavoriteTrackInteractor
 import com.example.playlistmaker.player.ui.models.PlayerState
+import com.example.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 
-class AudioPlayerViewModel(private val trackUrl: String?) : ViewModel() {
+class AudioPlayerViewModel(
+    private val trackUrl: String?,
+    private val favoriteTrackInteractor: FavoriteTrackInteractor
+) : ViewModel() {
     private val mediaPlayer = MediaPlayer()
     private var timerJob: Job? = null
     private val playerStateLiveData = MutableLiveData<PlayerState>(PlayerState.Default())
@@ -93,6 +100,7 @@ class AudioPlayerViewModel(private val trackUrl: String?) : ViewModel() {
     }
 
     private fun startTimerUpdate() {
+        timerJob?.cancel()
         timerJob = viewModelScope.launch {
             while (true) {
                 delay(TIMER_UPDATE_DELAY)
@@ -103,6 +111,19 @@ class AudioPlayerViewModel(private val trackUrl: String?) : ViewModel() {
             }
         }
     }
+
+    private fun onFavoriteClicked(track: Track): Flow<Unit> = flow {
+        if (!track.isFavorite) {
+            viewModelScope.launch {
+                favoriteTrackInteractor
+                    .addFavoriteTrack(track).collect {
+                        it
+                    }
+            }
+
+        }
+    }
+
 
     private fun getCurrentPlayerPosition(): String {
         return SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
