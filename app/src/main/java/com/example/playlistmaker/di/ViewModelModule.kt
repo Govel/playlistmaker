@@ -11,16 +11,16 @@ import org.koin.dsl.module
 
 val viewModelModule = module {
     viewModel {
-        SearchViewModel(get())
+        SearchViewModel(get(), get())
     }
     viewModel {
         SettingsViewModel(get(), get())
     }
     viewModel { (url: String) ->
-        AudioPlayerViewModel(url)
+        AudioPlayerViewModel(url, get())
     }
     viewModel {
-        FavoriteTracksViewModel()
+        FavoriteTracksViewModel(get())
     }
     viewModel {
         PlaylistsViewModel()

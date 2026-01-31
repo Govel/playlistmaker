@@ -138,7 +138,7 @@ class SearchFragment : Fragment() {
             binding.searchBar.addTextChangedListener(searchTextWatcher)
             binding.searchBar.setOnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    viewModel.searchDebounce(binding.searchBar.text.toString())
+                    viewModel.searchImmediately(binding.searchBar.text.toString())
                 }
                 false
             }

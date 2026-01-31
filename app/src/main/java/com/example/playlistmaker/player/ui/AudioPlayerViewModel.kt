@@ -5,7 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.db.domain.api.FavoriteTrackInteractor
 import com.example.playlistmaker.player.ui.models.PlayerState
+import com.example.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -13,11 +15,17 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 
-class AudioPlayerViewModel(private val trackUrl: String?) : ViewModel() {
+class AudioPlayerViewModel(
+    private val trackUrl: String?,
+    private val favoriteTrackInteractor: FavoriteTrackInteractor
+) : ViewModel() {
     private val mediaPlayer = MediaPlayer()
     private var timerJob: Job? = null
     private val playerStateLiveData = MutableLiveData<PlayerState>(PlayerState.Default())
     fun observePlayerState(): LiveData<PlayerState> = playerStateLiveData
+
+    private val isFavoriteLiveData = MutableLiveData<IsFavoriteTrack>()
+    fun observeIsFavoriteTrack(): LiveData<IsFavoriteTrack> = isFavoriteLiveData
 
     init {
         preparePlayer()
@@ -93,6 +101,7 @@ class AudioPlayerViewModel(private val trackUrl: String?) : ViewModel() {
     }
 
     private fun startTimerUpdate() {
+        timerJob?.cancel()
         timerJob = viewModelScope.launch {
             while (true) {
                 delay(TIMER_UPDATE_DELAY)
@@ -103,6 +112,25 @@ class AudioPlayerViewModel(private val trackUrl: String?) : ViewModel() {
             }
         }
     }
+    fun checkInitialFavoriteState(trackId: Long) {
+        viewModelScope.launch {
+            val isFavorite = favoriteTrackInteractor.isTrackFavorite(trackId)
+            isFavoriteLiveData.postValue(IsFavoriteTrack(isFavorite))
+        }
+    }
+    fun onFavoriteClicked(track: Track) {
+        viewModelScope.launch {
+            val isCurrentlyFavorite = favoriteTrackInteractor.isTrackFavorite(track.trackId)
+            if (isCurrentlyFavorite) {
+                favoriteTrackInteractor.deleteFavoriteTrack(track)
+            } else {
+                favoriteTrackInteractor.addFavoriteTrack(track)
+            }
+            val newState = !isCurrentlyFavorite
+            isFavoriteLiveData.postValue(IsFavoriteTrack(newState))
+        }
+    }
+
 
     private fun getCurrentPlayerPosition(): String {
         return SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
