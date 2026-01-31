@@ -173,13 +173,6 @@ class SearchFragment : Fragment() {
         super.onSaveInstanceState(outState)
     }
 
-//    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-//        super.onViewStateRestored(savedInstanceState)
-//        editTextSaver = savedInstanceState?.getString(EDIT_TEXT, TEXT_DEF).toString()
-//        binding.searchBar.setText(editTextSaver)
-//    }
-
-
     private fun clearButtonVisibility(s: CharSequence?): Boolean {
         return !s.isNullOrEmpty()
     }
