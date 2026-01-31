@@ -1,11 +1,11 @@
 package com.example.playlistmaker.db.data.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.playlistmaker.db.data.entity.FavoriteTrackEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FavoriteTrackDao {
@@ -13,11 +13,14 @@ interface FavoriteTrackDao {
     suspend fun insertFavoriteTrack(favoriteTrack: FavoriteTrackEntity)
 
     @Query("SELECT * FROM favorite_tracks_table")
-    suspend fun getFavoriteTracks(): List<FavoriteTrackEntity>
+    fun getFavoriteTracks(): Flow<List<FavoriteTrackEntity>>
 
-    @Query("SELECT id FROM favorite_tracks_table")
-    suspend fun getFavoriteTrackId(): List<FavoriteTrackEntity>
+    @Query("SELECT * FROM favorite_tracks_table")
+    fun getFavoriteTrackId(): List<FavoriteTrackEntity>
 
-    @Delete(entity = FavoriteTrackEntity::class)
-    suspend fun deleteFavoriteTrack(favoriteTrack: FavoriteTrackEntity)
+    @Query("SELECT EXISTS(SELECT 1 FROM favorite_tracks_table WHERE trackId = :trackId)")
+    suspend fun isTrackFavorite(trackId: Long): Boolean
+
+    @Query("DELETE FROM favorite_tracks_table WHERE trackId = :trackId")
+    suspend fun deleteFavoriteTrackByTrackId(trackId: Long)
 }

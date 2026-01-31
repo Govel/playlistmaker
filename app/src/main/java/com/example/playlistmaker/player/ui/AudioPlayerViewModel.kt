@@ -10,8 +10,6 @@ import com.example.playlistmaker.player.ui.models.PlayerState
 import com.example.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -25,6 +23,9 @@ class AudioPlayerViewModel(
     private var timerJob: Job? = null
     private val playerStateLiveData = MutableLiveData<PlayerState>(PlayerState.Default())
     fun observePlayerState(): LiveData<PlayerState> = playerStateLiveData
+
+    private val isFavoriteLiveData = MutableLiveData<IsFavoriteTrack>()
+    fun observeIsFavoriteTrack(): LiveData<IsFavoriteTrack> = isFavoriteLiveData
 
     init {
         preparePlayer()
@@ -111,16 +112,22 @@ class AudioPlayerViewModel(
             }
         }
     }
-
-    private fun onFavoriteClicked(track: Track): Flow<Unit> = flow {
-        if (!track.isFavorite) {
-            viewModelScope.launch {
-                favoriteTrackInteractor
-                    .addFavoriteTrack(track).collect {
-                        it
-                    }
+    fun checkInitialFavoriteState(trackId: Long) {
+        viewModelScope.launch {
+            val isFavorite = favoriteTrackInteractor.isTrackFavorite(trackId)
+            isFavoriteLiveData.postValue(IsFavoriteTrack(isFavorite))
+        }
+    }
+    fun onFavoriteClicked(track: Track) {
+        viewModelScope.launch {
+            val isCurrentlyFavorite = favoriteTrackInteractor.isTrackFavorite(track.trackId)
+            if (isCurrentlyFavorite) {
+                favoriteTrackInteractor.deleteFavoriteTrack(track)
+            } else {
+                favoriteTrackInteractor.addFavoriteTrack(track)
             }
-
+            val newState = !isCurrentlyFavorite
+            isFavoriteLiveData.postValue(IsFavoriteTrack(newState))
         }
     }
 

@@ -1,13 +1,18 @@
 package com.example.playlistmaker.db.data.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 
-@Entity(tableName = "favorite_tracks_table")
+@Entity(
+    tableName = "favorite_tracks_table",
+    indices = [Index(value = ["trackId"], unique = true)]
+    )
 data class FavoriteTrackEntity (
-    @PrimaryKey
-    val id: Long,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
+    val trackId: Long,
     val artworkUrl100: String,
     val trackName: String,
     val artistName: String,

@@ -9,11 +9,11 @@ import kotlinx.coroutines.flow.map
 class FavoriteTrackInteractorImpl(
     private val favoriteTrackRepository: FavoriteTrackRepository
 ): FavoriteTrackInteractor {
-    override fun addFavoriteTrack(track: Track): Flow<Unit> {
+    override suspend fun addFavoriteTrack(track: Track) {
         return favoriteTrackRepository.addFavoriteTrack(track)
     }
 
-    override fun deleteFavoriteTrack(track: Track): Flow<Unit> {
+    override suspend fun deleteFavoriteTrack(track: Track) {
         return favoriteTrackRepository.deleteFavoriteTrack(track)
     }
 
@@ -25,6 +25,10 @@ class FavoriteTrackInteractorImpl(
 
     override fun getFavoriteTrackId(): Flow<List<Track>> {
         return favoriteTrackRepository.getFavoriteTracks()
+    }
+
+    override suspend fun isTrackFavorite(trackId: Long): Boolean {
+        return favoriteTrackRepository.isTrackFavorite(trackId)
     }
 
 }

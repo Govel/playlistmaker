@@ -1,36 +1,33 @@
 package com.example.playlistmaker.db.data.repository
 
-import com.example.playlistmaker.db.data.AppDatabase
 import com.example.playlistmaker.db.data.convertor.FavoriteTrackDbConvertor
+import com.example.playlistmaker.db.data.dao.FavoriteTrackDao
 import com.example.playlistmaker.db.data.entity.FavoriteTrackEntity
 import com.example.playlistmaker.db.domain.api.FavoriteTrackRepository
 import com.example.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 
 class FavoriteTrackRepositoryImpl(
-    private val appDatabase: AppDatabase,
+    private val dao: FavoriteTrackDao,
     private val trackDbConvertor: FavoriteTrackDbConvertor,
 ) : FavoriteTrackRepository {
-    override fun addFavoriteTrack(track: Track): Flow<Unit> = flow {
+    override suspend fun addFavoriteTrack(track: Track) {
         val favoriteTrack = convertToTrackEntity(track)
-        val insertFavoriteTrack = appDatabase.favoriteTrackDao().insertFavoriteTrack(favoriteTrack)
-        emit(insertFavoriteTrack)
+        dao.insertFavoriteTrack(favoriteTrack)
     }
 
-    override fun deleteFavoriteTrack(track: Track): Flow<Unit> = flow {
-        val favoriteTrack = convertToTrackEntity(track)
-        val deleteFavoriteTrack = appDatabase.favoriteTrackDao().deleteFavoriteTrack(favoriteTrack)
-        emit(deleteFavoriteTrack)
+    override suspend fun deleteFavoriteTrack(track: Track) {
+        dao.deleteFavoriteTrackByTrackId(track.trackId)
     }
 
-    override fun getFavoriteTracks(): Flow<List<Track>> = flow {
-        val favoriteTracks = appDatabase.favoriteTrackDao().getFavoriteTracks()
-        emit(convertFromTrackEntity(tracks = favoriteTracks))
-    }
+    override fun getFavoriteTracks(): Flow<List<Track>> =
+        dao.getFavoriteTracks()
+            .map { entities -> entities.map { trackDbConvertor.map(it) } }
 
     override fun getFavoriteTracksId(): Flow<List<Track>> = flow {
-        val favoriteTracks = appDatabase.favoriteTrackDao().getFavoriteTrackId()
+        val favoriteTracks = dao.getFavoriteTrackId()
         emit(convertFromTrackEntity(tracks = favoriteTracks))
     }
 
@@ -42,4 +39,7 @@ class FavoriteTrackRepositoryImpl(
         return trackDbConvertor.map(track)
     }
 
+    override suspend fun isTrackFavorite(trackId: Long): Boolean {
+        return dao.isTrackFavorite(trackId)
+    }
 }

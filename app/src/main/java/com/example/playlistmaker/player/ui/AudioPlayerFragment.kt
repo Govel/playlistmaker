@@ -81,8 +81,17 @@ class AudioPlayerFragment : Fragment() {
             enableButton(it.isPlayButtonEnabled)
             binding.tvTrackTime.text = it.progress
         }
+
+        viewModel.observeIsFavoriteTrack().observe(viewLifecycleOwner) {
+            setImageButtonFavorite(it.isFavorite)
+        }
+        viewModel.checkInitialFavoriteState(currentTrack.trackId)
+
         binding.btPlay.setOnClickListener {
             viewModel.onPlayButtonClicked()
+        }
+        binding.btAddFavorite.setOnClickListener {
+            viewModel.onFavoriteClicked(currentTrack)
         }
     }
 
@@ -98,16 +107,23 @@ class AudioPlayerFragment : Fragment() {
     private fun setImageButtonPlay(buttonText: String) {
         binding.btPlay.setImageResource(if (buttonText == "PAUSE") R.drawable.pause else R.drawable.play)
     }
+
+    private fun setImageButtonFavorite(isFavorite: Boolean) {
+        binding.btAddFavorite.setImageResource(if (isFavorite) R.drawable.ic_is_favorite else R.drawable.favorite)
+    }
+
     fun render(state: PlayerState) {
         when (state) {
             is PlayerState.Default -> showProgressBar()
             else -> showContent()
         }
     }
+
     private fun showProgressBar() {
         binding.svPlayer.isVisible = false
         binding.pbPlayer.isVisible = true
     }
+
     private fun showContent() {
         binding.svPlayer.isVisible = true
         binding.pbPlayer.isVisible = false

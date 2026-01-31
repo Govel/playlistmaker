@@ -1,6 +1,5 @@
 package com.example.playlistmaker.search.ui
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,6 +15,7 @@ class SearchViewModel(
     private val tracksInteractor: TracksInteractor,
     private val favoriteTrackInteractor: FavoriteTrackInteractor
 ) : ViewModel() {
+    private var isSearchInProgress = false
     private val stateSearchLiveData = MutableLiveData<SearchState>()
     fun observeStateSearch(): LiveData<SearchState> = stateSearchLiveData
     private val tracksSearchDebounce = debounce<String>(
@@ -32,14 +32,21 @@ class SearchViewModel(
         }
     }
 
+    fun searchImmediately(query: String) {
+        latestSearchText = query
+        searchRequest(query)
+    }
+
     private fun searchRequest(newSearchText: String) {
-        if (newSearchText.isNotEmpty()) {
+        if (newSearchText.isNotEmpty() && !isSearchInProgress) {
+            isSearchInProgress = true
             renderState(SearchState.Loading)
             viewModelScope.launch {
                 tracksInteractor
                     .searchTracks(newSearchText)
                     .collect { pair ->
                         processResult(pair.first, pair.second)
+                        isSearchInProgress = false
                     }
             }
         }
@@ -77,10 +84,7 @@ class SearchViewModel(
             favoriteTracks.forEach { favoriteTrack ->
                 tracks.forEach { track ->
                     if (track.trackId == favoriteTrack.trackId) {
-                        Log.d("MyTag", "favoriteTrack: $favoriteTrack")
-                        Log.d("MyTag", "track: $track")
                         track.isFavorite = true
-                        Log.d("MyTag", "track: ${track.isFavorite}")
                     }
                 }
             }
