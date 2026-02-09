@@ -99,7 +99,7 @@
         android:background="@drawable/rounded_create_pl_bt"
         android:text="@string/create_album"
         android:textAppearance="@style/CreatePlaylistButtonTextStyle"
-        android:textColor="@color/colorOnPrimary"
+        android:textColor="@color/yp_white"
         app:backgroundTint="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
