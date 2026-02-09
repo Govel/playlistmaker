@@ -102,7 +102,7 @@ class NewPlaylistFragment : Fragment() {
                 ).show()
             }
         }
-
+        binding.btCreate.isEnabled = false
         exitDialog = MaterialAlertDialogBuilder(requireContext(), R.style.DialogTheme)
             .setTitle(getString(R.string.new_playlist_exit_dialog_name))
             .setMessage(getString(R.string.new_playlist_exit_dialog_description))

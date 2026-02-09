@@ -37,6 +37,7 @@ class AudioPlayerFragment : Fragment() {
     private lateinit var adapter: BsPlaylistsAdapter
 
     private lateinit var viewModel: AudioPlayerViewModel
+    private var shouldRestoreBottomSheet = false
 
 
     override fun onCreateView(
@@ -92,7 +93,6 @@ class AudioPlayerFragment : Fragment() {
             enableButton(it.isPlayButtonEnabled)
             binding.tvTrackTime.text = it.progress
         }
-
 
         viewModel.showPlaylists()
 
@@ -159,6 +159,7 @@ class AudioPlayerFragment : Fragment() {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
         binding.btNewPlaylist.setOnClickListener {
+            shouldRestoreBottomSheet = true
             val action =
                 NewPlaylistFragmentDirections.actionGlobalToNewPlaylistFragment()
             findNavController().navigate(action)
@@ -168,6 +169,18 @@ class AudioPlayerFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         viewModel.onPause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (shouldRestoreBottomSheet) {
+            shouldRestoreBottomSheet = false
+            val bottomSheetBehavior = BottomSheetBehavior.from(binding.standardBottomSheet)
+            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+            binding.overlay.isVisible = true
+        }
     }
 
     private fun enableButton(isEnabled: Boolean) {
