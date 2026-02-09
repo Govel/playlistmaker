@@ -7,6 +7,7 @@ import com.example.playlistmaker.di.interactorModule
 import com.example.playlistmaker.di.repositoryModule
 import com.example.playlistmaker.di.viewModelModule
 import com.example.playlistmaker.settings.domain.repository.SettingsInteractor
+import com.markodevcic.peko.PermissionRequester
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -23,6 +24,7 @@ class App : Application() {
             modules(dataModule, repositoryModule, interactorModule, viewModelModule)
         }
         get<SettingsInteractor>().switchTheme()
+        PermissionRequester.initialize(applicationContext)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

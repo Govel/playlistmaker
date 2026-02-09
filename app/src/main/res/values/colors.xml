@@ -10,7 +10,7 @@
     <color name="yp_light_gray">#E6E8EB</color>
     <color name="colorPrimaryVariant">@color/yp_gray</color>
     <color name="colorPrimary">@color/yp_blue</color>
-    <color name="main_bg_color">@color/yp_blue</color>
+    <color name="main_bg_color">@color/yp_white</color>
     <color name="secondary_bg_color">@color/yp_white</color>
     <color name="colorOnPrimary">@color/yp_black</color>
     <color name="gray_white">@color/yp_gray</color>
@@ -19,4 +19,6 @@
     <color name="bt_txt_color_variant">@color/yp_white</color>
     <color name="icon_black_white">@color/icon_black</color>
     <color name="light_gray_to_white">@color/yp_light_gray</color>
+    <color name="red_500">#F44336</color>
+    <color name="transparent_color">#00000000</color>
 </resources>

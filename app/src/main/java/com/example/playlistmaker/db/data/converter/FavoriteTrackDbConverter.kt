@@ -1,9 +1,9 @@
-package com.example.playlistmaker.db.data.convertor
+package com.example.playlistmaker.db.data.converter
 
 import com.example.playlistmaker.db.data.entity.FavoriteTrackEntity
 import com.example.playlistmaker.search.domain.models.Track
 
-class FavoriteTrackDbConvertor {
+class FavoriteTrackDbConverter {
     fun map(track: Track): FavoriteTrackEntity {
         return FavoriteTrackEntity(0, track.trackId, track.artworkUrl100, track.trackName, track.artistName, track.collectionName, track.releaseDate, track.primaryGenreName, track.country, track.trackTimeMillis, track.previewUrl)
     }

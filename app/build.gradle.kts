@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("kotlin-parcelize")
-    id("androidx.navigation.safeargs.kotlin") version "2.9.6"
+    id("androidx.navigation.safeargs.kotlin") version "2.9.7"
     id("com.google.devtools.ksp") version "2.3.4" apply true
 }
 
@@ -46,6 +46,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.peko)
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     implementation(libs.kotlinx.coroutines.android)

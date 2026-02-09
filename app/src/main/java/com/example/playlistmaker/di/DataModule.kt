@@ -3,7 +3,9 @@ package com.example.playlistmaker.di
 import android.content.Context
 import androidx.room.Room
 import com.example.playlistmaker.db.data.AppDatabase
-import com.example.playlistmaker.db.data.convertor.FavoriteTrackDbConvertor
+import com.example.playlistmaker.db.data.converter.FavoriteTrackDbConverter
+import com.example.playlistmaker.db.data.converter.PlaylistDbConverter
+import com.example.playlistmaker.db.data.converter.TrackIntoPlaylistsDbConverter
 import com.example.playlistmaker.search.data.storages.local.SharedPrefsClient
 import com.example.playlistmaker.search.data.storages.local.SharedPrefsHistoryTracks
 import com.example.playlistmaker.search.data.storages.local.SharedPrefsNightMode
@@ -42,7 +44,19 @@ val dataModule = module {
         get<AppDatabase>().favoriteTrackDao()
     }
 
-    single { FavoriteTrackDbConvertor() }
+    single {
+        get<AppDatabase>().playlistsDao()
+    }
+
+    single {
+        get<AppDatabase>().trackIntoPlaylistsDao()
+    }
+
+    single { FavoriteTrackDbConverter() }
+
+    single { PlaylistDbConverter() }
+
+    single { TrackIntoPlaylistsDbConverter() }
 
     single<NetworkClient> {
         RetrofitNetworkClient(get(), androidContext())
