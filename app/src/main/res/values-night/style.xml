@@ -70,4 +70,10 @@
         <item name="android:textColor">@color/yp_blue</item>
     </style>
 
+    <style name="TextAppearance.FloatingLabel" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/yp_gray</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
 </resources>

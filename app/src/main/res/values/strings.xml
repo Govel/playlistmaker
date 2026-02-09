@@ -29,6 +29,19 @@
     <string name="playlists">Плейлисты</string>
     <string name="playlists_is_empty">Вы не создали \nни одного плейлиста</string>
     <string name="media_library_is_empty">Ваша медиатека пуста</string>
-    <string name="new_playlists">Новый плейлист</string>
+    <string name="new_playlist">Новый плейлист</string>
     <string name="no_favorite_tracks" translatable="false">Избранных треков нет!</string>
+    <string name="album_name">Название*</string>
+    <string name="album_description">Описание</string>
+    <string name="create_album">Создать</string>
+    <string name="add_to_playlist">Добавить в плейлист</string>
+    <string name="track_added_to_playlist">Трек добавлен в плейлист</string>
+    <string name="track_in_playlist">Трек уже есть в этом плейлисте</string>
+    <string name="playlist">Плейлист</string>
+    <string name="created">создан</string>
+    <string name="new_playlist_exit_dialog_name">Завершить создание плейлиста?</string>
+    <string name="new_playlist_exit_dialog_description">Все несохраненные данные будут потеряны</string>
+    <string name="cansel">Отмена</string>
+    <string name="complete">Завершить</string>
+    <string name="error_save_image">Ошибка сохранения</string>
 </resources>

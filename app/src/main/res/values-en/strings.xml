@@ -26,5 +26,18 @@
     <string name="playlists">Playlists</string>
     <string name="playlists_is_empty">You haven\'t \ncreated any playlists</string>
     <string name="media_library_is_empty">Your media library is empty</string>
-    <string name="new_playlists">New Playlist</string>
+    <string name="new_playlist">New Playlist</string>
+    <string name="album_name">Name*</string>
+    <string name="album_description">Description</string>
+    <string name="create_album">Create</string>
+    <string name="add_to_playlist">Add To Playlist</string>
+    <string name="track_added_to_playlist">Track added to playlist</string>
+    <string name="track_in_playlist">The track is already in this playlist!</string>
+    <string name="playlist">Playlist</string>
+    <string name="created">created</string>
+    <string name="new_playlist_exit_dialog_name">Finish creating a playlist?</string>
+    <string name="new_playlist_exit_dialog_description">All unsaved data will be lost</string>
+    <string name="cansel">Cancel</string>
+    <string name="complete">Complete</string>
+    <string name="error_save_image">Save error</string>
 </resources>

@@ -1,6 +1,6 @@
 package com.example.playlistmaker.db.data.repository
 
-import com.example.playlistmaker.db.data.convertor.FavoriteTrackDbConvertor
+import com.example.playlistmaker.db.data.converter.FavoriteTrackDbConverter
 import com.example.playlistmaker.db.data.dao.FavoriteTrackDao
 import com.example.playlistmaker.db.data.entity.FavoriteTrackEntity
 import com.example.playlistmaker.db.domain.api.FavoriteTrackRepository
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.map
 
 class FavoriteTrackRepositoryImpl(
     private val dao: FavoriteTrackDao,
-    private val trackDbConvertor: FavoriteTrackDbConvertor,
+    private val trackDbConverter: FavoriteTrackDbConverter,
 ) : FavoriteTrackRepository {
     override suspend fun addFavoriteTrack(track: Track) {
         val favoriteTrack = convertToTrackEntity(track)
@@ -24,7 +24,7 @@ class FavoriteTrackRepositoryImpl(
 
     override fun getFavoriteTracks(): Flow<List<Track>> =
         dao.getFavoriteTracks()
-            .map { entities -> entities.map { trackDbConvertor.map(it) } }
+            .map { entities -> entities.map { trackDbConverter.map(it) } }
 
     override fun getFavoriteTracksId(): Flow<List<Track>> = flow {
         val favoriteTracks = dao.getFavoriteTrackId()
@@ -32,11 +32,11 @@ class FavoriteTrackRepositoryImpl(
     }
 
     private fun convertFromTrackEntity(tracks: List<FavoriteTrackEntity>): List<Track> {
-        return tracks.map { track -> trackDbConvertor.map(track) }
+        return tracks.map { track -> trackDbConverter.map(track) }
     }
 
     private fun convertToTrackEntity(track: Track): FavoriteTrackEntity {
-        return trackDbConvertor.map(track)
+        return trackDbConverter.map(track)
     }
 
     override suspend fun isTrackFavorite(trackId: Long): Boolean {
