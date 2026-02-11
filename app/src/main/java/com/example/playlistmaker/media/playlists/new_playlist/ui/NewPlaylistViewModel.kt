@@ -8,24 +8,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.db.domain.api.PlaylistsInteractor
 import com.example.playlistmaker.media.playlists.new_playlist.domain.api.ExternalStorageInteractor
-import com.example.playlistmaker.media.playlists.new_playlist.domain.model.Playlist
+import com.example.playlistmaker.media.playlists.new_playlist.domain.models.Playlist
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class NewPlaylistViewModel(
-    private val playlistsInteractor: PlaylistsInteractor,
-    private val externalStorageInteractor: ExternalStorageInteractor
+open class NewPlaylistViewModel(
+    protected val playlistsInteractor: PlaylistsInteractor,
+    protected val externalStorageInteractor: ExternalStorageInteractor
 ): ViewModel() {
 
-    private val imageUrlLiveData = MutableLiveData<Uri?>(null)
-    fun observeImageUrl(): LiveData<Uri?> = imageUrlLiveData
+    protected val imageUrlLiveData = MutableLiveData<Uri?>(null)
+    open fun observeImageUrl(): LiveData<Uri?> = imageUrlLiveData
 
-    private val saveResult = MutableLiveData<Boolean>()
-    fun observeSaveResult(): LiveData<Boolean> = saveResult
+    protected val saveResult = MutableLiveData<Boolean>()
+    open fun observeSaveResult(): LiveData<Boolean> = saveResult
 
-    fun addToDb(playlistName: String, playlistDescription: String) {
+    open fun addToDb(playlistName: String, playlistDescription: String) {
         val coverFileName = "${playlistName}_${System.currentTimeMillis()}.jpg"
         viewModelScope.launch {
             try {

@@ -9,8 +9,9 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.playlistmaker.databinding.FragmentPlaylistsBinding
-import com.example.playlistmaker.media.playlists.new_playlist.domain.model.Playlist
+import com.example.playlistmaker.media.playlists.new_playlist.domain.models.Playlist
 import com.example.playlistmaker.media.playlists.new_playlist.ui.NewPlaylistFragmentDirections
+import com.example.playlistmaker.media.playlists.playlist.ui.PlaylistFragmentDirections
 import com.example.playlistmaker.media.playlists.ui.models.PlaylistsState
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -44,7 +45,11 @@ class PlaylistsFragment : Fragment() {
 
         viewModel.showPlaylists()
 
-        adapter = PlaylistsAdapter(playlists) { viewModel.getUriForCover(it) }
+        adapter = PlaylistsAdapter(playlists, { viewModel.getUriForCover(it) }) { currentPlaylist ->
+            val action =
+                PlaylistFragmentDirections.actionGlobalToPlaylistFragment(currentPlaylist)
+            findNavController().navigate(action)
+        }
 
         binding.rvPlaylists.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.rvPlaylists.adapter = adapter

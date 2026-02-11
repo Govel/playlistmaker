@@ -6,6 +6,8 @@ import com.example.playlistmaker.db.domain.impl.FavoriteTrackInteractorImpl
 import com.example.playlistmaker.db.domain.impl.PlaylistsInteractorImpl
 import com.example.playlistmaker.media.playlists.new_playlist.domain.api.ExternalStorageInteractor
 import com.example.playlistmaker.media.playlists.new_playlist.domain.impl.ExternalStorageInteractorImpl
+import com.example.playlistmaker.media.playlists.playlist.domain.api.PlaylistInteractor
+import com.example.playlistmaker.media.playlists.playlist.domain.impl.PlaylistInteractorImpl
 import com.example.playlistmaker.search.domain.impl.TracksInteractorImpl
 import com.example.playlistmaker.search.domain.repository.TracksInteractor
 import com.example.playlistmaker.settings.domain.impl.SettingsInteractorImpl
@@ -32,5 +34,8 @@ val interactorModule = module {
     }
     factory<ExternalStorageInteractor> {
         ExternalStorageInteractorImpl(get())
+    }
+    factory<PlaylistInteractor> {
+        PlaylistInteractorImpl(get())
     }
 }

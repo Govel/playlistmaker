@@ -16,4 +16,7 @@ class LocalUtils {
     fun dateFormat (date: Long): String {
         return SimpleDateFormat("mm:ss", Locale.getDefault()).format(date)
     }
+    fun dateMmFormat (date: Long): String {
+        return SimpleDateFormat("m", Locale.getDefault()).format(date)
+    }
 }

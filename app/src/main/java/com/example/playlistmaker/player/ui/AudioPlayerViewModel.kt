@@ -10,7 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.db.domain.api.FavoriteTrackInteractor
 import com.example.playlistmaker.db.domain.api.PlaylistsInteractor
 import com.example.playlistmaker.media.playlists.new_playlist.domain.api.ExternalStorageInteractor
-import com.example.playlistmaker.media.playlists.new_playlist.domain.model.Playlist
+import com.example.playlistmaker.media.playlists.new_playlist.domain.models.Playlist
 import com.example.playlistmaker.player.ui.models.IsFavoriteTrack
 import com.example.playlistmaker.player.ui.models.PlayerState
 import com.example.playlistmaker.player.ui.models.TrackIds
@@ -186,7 +186,7 @@ class AudioPlayerViewModel(
         if (!tracksList.contains(currentTrack.trackId)) {
             isInPlaylist.postValue(Pair(clickedPlaylist.name, true))
             viewModelScope.launch {
-                playlistsInteractor.updatePlaylist(clickedPlaylist, currentTrack, tracksList)
+                playlistsInteractor.updateTrackIntoPlaylist(clickedPlaylist, currentTrack, tracksList, false)
                 playlistsInteractor.addTrackIntoPlaylists(currentTrack)
                 showPlaylists()
             }

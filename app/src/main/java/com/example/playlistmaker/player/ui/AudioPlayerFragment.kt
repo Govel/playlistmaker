@@ -14,7 +14,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentAudioPlayerBinding
-import com.example.playlistmaker.media.playlists.new_playlist.domain.model.Playlist
+import com.example.playlistmaker.media.playlists.new_playlist.domain.models.Playlist
 import com.example.playlistmaker.media.playlists.new_playlist.ui.NewPlaylistFragmentDirections
 import com.example.playlistmaker.player.ui.models.PlayerState
 import com.example.playlistmaker.player.ui.models.TrackOnPlaylistState
@@ -27,7 +27,6 @@ import org.koin.core.parameter.parametersOf
 class AudioPlayerFragment : Fragment() {
     private var _binding: FragmentAudioPlayerBinding? = null
     private val binding get() = _binding!!
-
     private val args: AudioPlayerFragmentArgs by navArgs()
     private val track: Track get() = args.currentTrack
     private lateinit var currentTrack: Track

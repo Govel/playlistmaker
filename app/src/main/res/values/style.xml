@@ -91,7 +91,7 @@
 
     <style name="DialogTheme.Button" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="backgroundTint">@color/transparent_color</item>
-        <item name="android:textColor">?attr/colorSecondary</item>
+        <item name="android:textColor">@color/yp_blue</item>
     </style>
 
     <style name="Button" parent="Widget.MaterialComponents.Button.UnelevatedButton">

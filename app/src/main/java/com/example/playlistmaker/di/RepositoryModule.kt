@@ -6,6 +6,8 @@ import com.example.playlistmaker.db.domain.api.FavoriteTrackRepository
 import com.example.playlistmaker.db.domain.api.PlaylistsRepository
 import com.example.playlistmaker.media.playlists.new_playlist.data.impl.ExternalStorageRepositoryImpl
 import com.example.playlistmaker.media.playlists.new_playlist.domain.api.ExternalStorageRepository
+import com.example.playlistmaker.media.playlists.playlist.data.PlaylistRepositoryImpl
+import com.example.playlistmaker.media.playlists.playlist.domain.api.PlaylistRepository
 import com.example.playlistmaker.search.data.repository.HistoryRepositoryImpl
 import com.example.playlistmaker.search.data.repository.TracksSearchRepositoryImpl
 import com.example.playlistmaker.search.data.storages.local.SharedPrefsClient
@@ -39,5 +41,8 @@ val repositoryModule = module {
     }
     single<ExternalStorageRepository> {
         ExternalStorageRepositoryImpl(androidContext())
+    }
+    single<PlaylistRepository> {
+        PlaylistRepositoryImpl(androidContext())
     }
 }

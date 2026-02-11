@@ -28,13 +28,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class NewPlaylistFragment : Fragment() {
+open class NewPlaylistFragment : Fragment() {
     private var _binding: FragmentNewPlaylistBinding? = null
-    private val binding get() = _binding!!
+    protected val binding get() = _binding!!
     private var playlistName: String = ""
     private lateinit var playlistDescription: String
     private var isClickAllowed = true
-    private val viewModel by viewModel<NewPlaylistViewModel>()
+    protected open val viewModel by viewModel<NewPlaylistViewModel>()
     private var playlistImgPath: Uri? = null
     private lateinit var exitDialog: MaterialAlertDialogBuilder
 
@@ -89,11 +89,7 @@ class NewPlaylistFragment : Fragment() {
         viewModel.observeSaveResult().observe(viewLifecycleOwner) { success ->
             if (success) {
                 findNavController().navigateUp()
-                val message =
-                    getString(R.string.playlist) + " ${binding.etPlaylistName.text.toString()} " + getString(
-                        R.string.created
-                    )
-                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                showSuccessToast()
             } else {
                 Toast.makeText(
                     requireContext(),
@@ -106,7 +102,7 @@ class NewPlaylistFragment : Fragment() {
         exitDialog = MaterialAlertDialogBuilder(requireContext(), R.style.DialogTheme)
             .setTitle(getString(R.string.new_playlist_exit_dialog_name))
             .setMessage(getString(R.string.new_playlist_exit_dialog_description))
-            .setNeutralButton(getString(R.string.cansel)) { _, _ -> }
+            .setNeutralButton(getString(R.string.cancel)) { _, _ -> }
             .setPositiveButton(getString(R.string.complete)) { _, _ ->
                 findNavController().navigateUp()
             }
@@ -116,6 +112,7 @@ class NewPlaylistFragment : Fragment() {
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     exitFromFragment()
@@ -160,7 +157,7 @@ class NewPlaylistFragment : Fragment() {
         }
     }
 
-    private fun exitFromFragment() {
+    protected open fun exitFromFragment() {
         if (
             !binding.etPlaylistName.text.isNullOrEmpty() ||
             !binding.etPlaylistDescription.text.isNullOrEmpty() ||
@@ -170,6 +167,12 @@ class NewPlaylistFragment : Fragment() {
         } else {
             findNavController().navigateUp()
         }
+    }
+
+    protected open fun showSuccessToast() {
+        val message =
+            getString(R.string.playlist) + " ${binding.etPlaylistName.text.toString()} " + getString(R.string.created)
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     companion object {
