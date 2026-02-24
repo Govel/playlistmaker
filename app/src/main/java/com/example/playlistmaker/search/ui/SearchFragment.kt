@@ -3,8 +3,6 @@ package com.example.playlistmaker.search.ui
 
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -115,7 +113,7 @@ class SearchFragment : Fragment() {
             render(it)
         }
 
-        val searchTextWatcher =binding.searchBar.doOnTextChanged { text, start, before, count ->
+        val searchTextWatcher =binding.searchBar.doOnTextChanged { text, _, _, _ ->
             if (text.isNullOrEmpty()) {
                 renderHistoryIfNeeded()
             } else {
