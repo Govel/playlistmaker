@@ -11,8 +11,6 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.databinding.RvBsPlaylistsBinding
 import com.example.playlistmaker.media.playlists.new_playlist.domain.models.Playlist
-import com.example.playlistmaker.util.FormatTracksCount
-import com.example.playlistmaker.util.LocalUtils
 
 class BsPlaylistsViewHolder(private val binding: RvBsPlaylistsBinding): RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("SetTextI18n")
