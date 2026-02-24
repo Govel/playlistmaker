@@ -57,4 +57,9 @@
     <string name="save">Сохранить</string>
     <string name="empty_tracks_in_playlist">В этом плейлисте пока еще нет треков…</string>
     <string name="edit_playlist_success">изменен</string>
+    <plurals name="tracks">
+        <item quantity="one">%d трек</item>
+        <item quantity="few">%d трека</item>
+        <item quantity="many">%d треков</item>
+    </plurals>
 </resources>

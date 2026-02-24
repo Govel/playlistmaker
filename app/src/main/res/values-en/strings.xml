@@ -53,4 +53,8 @@
     <string name="save">Save</string>
     <string name="empty_tracks_in_playlist">There are no tracks in this playlist yet…</string>
     <string name="edit_playlist_success">changed</string>
+    <plurals name="tracks">
+        <item quantity="one">%d track</item>
+        <item quantity="other">%d tracks</item>
+    </plurals>
 </resources>
