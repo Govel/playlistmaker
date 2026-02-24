@@ -18,7 +18,8 @@ class PlaylistsViewHolder(private val binding: RvPlaylistsBinding): RecyclerView
     @SuppressLint("SetTextI18n")
     fun bind(data: Playlist?, coverUri: Uri?) {
         binding.title.text = data?.name
-        binding.totalTracks.text = FormatTracksCount().format(data?.totalTracks)
+        binding.totalTracks.text = itemView.resources.getQuantityString(R.plurals.tracks,
+            data?.totalTracks ?: 0, data?.totalTracks ?: 0)
         Glide.with(binding.root)
             .load(coverUri)
             .placeholder(R.drawable.placeholder_cover)

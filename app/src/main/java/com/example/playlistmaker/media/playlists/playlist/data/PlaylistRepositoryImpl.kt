@@ -2,6 +2,7 @@ package com.example.playlistmaker.media.playlists.playlist.data
 
 import android.content.Context
 import android.content.Intent
+import com.example.playlistmaker.R
 import com.example.playlistmaker.media.playlists.new_playlist.domain.models.Playlist
 import com.example.playlistmaker.media.playlists.playlist.domain.api.PlaylistRepository
 import com.example.playlistmaker.search.domain.models.Track
@@ -16,17 +17,8 @@ class PlaylistRepositoryImpl(private val context: Context): PlaylistRepository {
         context.startActivity(Intent.createChooser(shareIntent, null).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
 
-    private fun formatTrack(count: Int): String {
-        return when (count % 10) {
-            0, 5, 6, 7, 8, 9 -> " треков"
-            2, 3, 4 -> " трека"
-            else -> " трек"
-        }
-    }
-
     private fun getText(playlist: Playlist?,tracks: List<Track>) : String {
-
-        var text = "${playlist?.name}\n${playlist?.description}\n${tracks.size} ${formatTrack(tracks.size)}"
+        var text = "${playlist?.name}\n${playlist?.description}\n" + context.resources.getQuantityString(R.plurals.tracks, tracks.size, tracks.size)
         for (i in 0 until tracks.size) {
             val track = tracks[i]
             text += "\n${i + 1}. ${track.artistName} - ${track.trackName} (${LocalUtils().dateFormat(track.trackTimeMillis)})"
