@@ -10,15 +10,15 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.databinding.RvPlaylistsBinding
-import com.example.playlistmaker.media.playlists.new_playlist.domain.model.Playlist
-import com.example.playlistmaker.util.FormatTracksCount
+import com.example.playlistmaker.media.playlists.new_playlist.domain.models.Playlist
 import com.example.playlistmaker.util.LocalUtils
 
 class PlaylistsViewHolder(private val binding: RvPlaylistsBinding): RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("SetTextI18n")
     fun bind(data: Playlist?, coverUri: Uri?) {
         binding.title.text = data?.name
-        binding.totalTracks.text = FormatTracksCount().format(data?.totalTracks)
+        binding.totalTracks.text = itemView.resources.getQuantityString(R.plurals.tracks,
+            data?.totalTracks ?: 0, data?.totalTracks ?: 0)
         Glide.with(binding.root)
             .load(coverUri)
             .placeholder(R.drawable.placeholder_cover)

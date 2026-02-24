@@ -41,6 +41,4 @@
             android:textSize="12sp"
             tools:text="12 треков" />
     </LinearLayout>
-
-
 </LinearLayout>

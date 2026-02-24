@@ -3,8 +3,6 @@ package com.example.playlistmaker.search.domain.models
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
-const val TAG_CURRENT_TRACK = "current_track"
-
 @Parcelize
 data class Track(
     val trackId: Long,

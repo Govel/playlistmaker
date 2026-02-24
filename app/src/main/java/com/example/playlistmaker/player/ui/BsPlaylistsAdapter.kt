@@ -3,7 +3,7 @@ package com.example.playlistmaker.player.ui
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.media.playlists.new_playlist.domain.api.ExternalInteractor
-import com.example.playlistmaker.media.playlists.new_playlist.domain.model.Playlist
+import com.example.playlistmaker.media.playlists.new_playlist.domain.models.Playlist
 
 class BsPlaylistsAdapter(
     private val playlists: List<Playlist>,

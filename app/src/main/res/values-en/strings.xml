@@ -37,7 +37,24 @@
     <string name="created">created</string>
     <string name="new_playlist_exit_dialog_name">Finish creating a playlist?</string>
     <string name="new_playlist_exit_dialog_description">All unsaved data will be lost</string>
-    <string name="cansel">Cancel</string>
+    <string name="cancel">Cancel</string>
     <string name="complete">Complete</string>
     <string name="error_save_image">Save error</string>
+    <string name="delete_track_into_playlist">Do you want to delete a track?</string>
+    <string name="want_delete_playlist">Do you want to delete the playlist</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="empty_tracks_into_playlist">This playlist does not have a list of tracks to share</string>
+    <string name="ok">OK</string>
+    <string name="share_playlist">Share</string>
+    <string name="edit_playlist">Edit information</string>
+    <string name="delete_playlist">Delete playlist</string>
+    <string name="edit">Edit</string>
+    <string name="save">Save</string>
+    <string name="empty_tracks_in_playlist">There are no tracks in this playlist yet…</string>
+    <string name="edit_playlist_success">changed</string>
+    <plurals name="tracks">
+        <item quantity="one">%d track</item>
+        <item quantity="other">%d tracks</item>
+    </plurals>
 </resources>

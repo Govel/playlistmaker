@@ -21,4 +21,5 @@ data class TrackIntoPlaylistsEntity (
     val country: String?,
     val trackTimeMillis: Long,
     val previewUrl: String?,
+    var isFavorite: Boolean
 )

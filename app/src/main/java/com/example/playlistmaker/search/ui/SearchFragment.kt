@@ -3,14 +3,14 @@ package com.example.playlistmaker.search.ui
 
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -113,29 +113,24 @@ class SearchFragment : Fragment() {
             render(it)
         }
 
-        val searchTextWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        val searchTextWatcher =binding.searchBar.doOnTextChanged { text, _, _, _ ->
+            if (text.isNullOrEmpty()) {
+                renderHistoryIfNeeded()
+            } else {
+                binding.llSearchHistory.isVisible = false
             }
+            binding.searchClearIcon.isVisible = clearButtonVisibility(text)
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s.isNullOrEmpty()) {
-                    renderHistoryIfNeeded()
-                } else {
-                    binding.llSearchHistory.isVisible = false
-                }
-                binding.searchClearIcon.isVisible = clearButtonVisibility(s)
-
-                viewModel.searchDebounce(
-                    changedText = s?.toString() ?: ""
-                )
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                editTextSaver = s?.toString() ?: ""
-            }
+            viewModel.searchDebounce(
+                text?.toString() ?: ""
+            )
         }
+
         searchTextWatcher.let {
             binding.searchBar.addTextChangedListener(searchTextWatcher)
+            binding.searchBar.doAfterTextChanged { text ->
+                editTextSaver = text?.toString() ?: ""
+            }
             binding.searchBar.setOnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     viewModel.searchImmediately(binding.searchBar.text.toString())

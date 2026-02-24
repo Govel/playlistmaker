@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.db.domain.api.PlaylistsInteractor
 import com.example.playlistmaker.media.playlists.new_playlist.domain.api.ExternalStorageInteractor
-import com.example.playlistmaker.media.playlists.new_playlist.domain.model.Playlist
+import com.example.playlistmaker.media.playlists.new_playlist.domain.models.Playlist
 import com.example.playlistmaker.media.playlists.ui.models.PlaylistsState
 import kotlinx.coroutines.launch
 
