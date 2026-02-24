@@ -125,9 +125,10 @@ open class NewPlaylistFragment : Fragment() {
             }
         }
 
-        binding.etPlaylistName.doOnTextChanged { text, _, _, _ ->
-            binding.btCreate.isEnabled = text.isNullOrEmpty()
+        val playlistNameTextWatcher = binding.etPlaylistName.doOnTextChanged { text, _, _, _ ->
+            binding.btCreate.isEnabled = !text.isNullOrEmpty()
         }
+        playlistNameTextWatcher.let { binding.etPlaylistName.addTextChangedListener(playlistNameTextWatcher) }
 
         binding.btCreate.setOnClickListener {
             playlistName = binding.etPlaylistName.text.toString()

@@ -113,7 +113,7 @@ class SearchFragment : Fragment() {
             render(it)
         }
 
-        val searchTextWatcher =binding.searchBar.doOnTextChanged { text, _, _, _ ->
+        val searchTextWatcher = binding.searchBar.doOnTextChanged { text, _, _, _ ->
             if (text.isNullOrEmpty()) {
                 renderHistoryIfNeeded()
             } else {
@@ -127,10 +127,10 @@ class SearchFragment : Fragment() {
         }
 
         searchTextWatcher.let {
-            binding.searchBar.addTextChangedListener(searchTextWatcher)
             binding.searchBar.doAfterTextChanged { text ->
                 editTextSaver = text?.toString() ?: ""
             }
+            binding.searchBar.addTextChangedListener(searchTextWatcher)
             binding.searchBar.setOnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     viewModel.searchImmediately(binding.searchBar.text.toString())
