@@ -88,7 +88,7 @@ class AudioPlayerFragment : Fragment() {
         binding.tvTrackCountry.text = currentTrack.country ?: ""
         viewModel.observePlayerState().observe(viewLifecycleOwner) {
             render(it)
-            setImageButtonPlay(it.buttonText)
+            binding.btPlay.setPlaying(it.isPlaying)
             enableButton(it.isPlayButtonEnabled)
             binding.tvTrackTime.text = it.progress
         }
@@ -184,10 +184,6 @@ class AudioPlayerFragment : Fragment() {
 
     private fun enableButton(isEnabled: Boolean) {
         binding.btPlay.isEnabled = isEnabled
-    }
-
-    private fun setImageButtonPlay(buttonText: String) {
-        binding.btPlay.setImageResource(if (buttonText == "PAUSE") R.drawable.pause else R.drawable.play)
     }
 
     private fun setImageButtonFavorite(isFavorite: Boolean) {
