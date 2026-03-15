@@ -1,16 +1,16 @@
 [versions]
-agp = "9.0.1"
+agp = "9.1.0"
 converterGson = "3.0.0"
 fragmentKtx = "1.8.9"
 glide = "5.0.5"
 koinAndroid = "4.1.1"
 kotlin = "2.3.10"
-coreKtx = "1.17.0"
+coreKtx = "1.18.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 appcompat = "1.7.1"
-activity = "1.12.4"
+activity = "1.13.0"
 constraintlayout = "2.2.1"
 kotlinxCoroutinesAndroid = "1.10.2"
 materialVersion = "1.13.0"
@@ -19,6 +19,7 @@ peko = "3.0.5"
 retrofit = "3.0.0"
 roomRuntime = "2.8.4"
 viewpager2 = "1.1.0"
+ksp = "2.3.4"
 
 [libraries]
 
@@ -46,4 +47,6 @@ retrofit2-converter-gson = { module = "com.squareup.retrofit2:converter-gson", v
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+androidx-navigation = { id = "androidx.navigation.safeargs.kotlin", version.ref = "navigationFragmentKtx" }
+google-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 

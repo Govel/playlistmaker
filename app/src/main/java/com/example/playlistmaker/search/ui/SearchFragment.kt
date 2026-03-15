@@ -1,7 +1,11 @@
 package com.example.playlistmaker.search.ui
 
 
+import android.content.Context
 import android.content.Context.INPUT_METHOD_SERVICE
+import android.content.IntentFilter
+import android.net.ConnectivityManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +21,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.search.domain.models.Track
+import com.example.playlistmaker.util.NetworkCheckBroadcastReceiver
 import com.example.playlistmaker.util.debounce
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -30,6 +35,8 @@ class SearchFragment : Fragment() {
     private var editTextSaver: String = TEXT_DEF
     private val tracksSearch = ArrayList<Track>()
     private val tracksHistory = mutableListOf<Track>()
+    private val networkCheckBroadcastReceiver = NetworkCheckBroadcastReceiver()
+    private var receiverRegistered = false
 
     private var adapter = TrackAdapter(tracksSearch) { clickedTrack ->
         if (clickDebounce()) {
@@ -62,6 +69,32 @@ class SearchFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         renderHistoryIfNeeded()
+        checkConnection()
+    }
+
+    private fun checkConnection() {
+        if (!receiverRegistered) {
+            val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                requireContext().registerReceiver(
+                    networkCheckBroadcastReceiver,
+                    filter,
+                    Context.RECEIVER_NOT_EXPORTED
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                requireContext().registerReceiver(networkCheckBroadcastReceiver, filter)
+            }
+
+            receiverRegistered = true
+        }
+    }
+
+    override fun onPause() {
+        requireContext().unregisterReceiver(networkCheckBroadcastReceiver)
+        receiverRegistered = false
+        super.onPause()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

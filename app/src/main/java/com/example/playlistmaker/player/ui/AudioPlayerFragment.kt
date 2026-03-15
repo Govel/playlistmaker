@@ -1,5 +1,9 @@
 package com.example.playlistmaker.player.ui
 
+import android.content.Context
+import android.content.IntentFilter
+import android.net.ConnectivityManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +24,7 @@ import com.example.playlistmaker.player.ui.models.PlayerState
 import com.example.playlistmaker.player.ui.models.TrackOnPlaylistState
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.util.LocalUtils
+import com.example.playlistmaker.util.NetworkCheckBroadcastReceiver
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import org.koin.android.ext.android.getKoin
 import org.koin.core.parameter.parametersOf
@@ -37,6 +42,8 @@ class AudioPlayerFragment : Fragment() {
 
     private lateinit var viewModel: AudioPlayerViewModel
     private var shouldRestoreBottomSheet = false
+    private val networkCheckBroadcastReceiver = NetworkCheckBroadcastReceiver()
+    private var receiverRegistered = false
 
 
     override fun onCreateView(
@@ -166,6 +173,8 @@ class AudioPlayerFragment : Fragment() {
     }
 
     override fun onPause() {
+        requireContext().unregisterReceiver(networkCheckBroadcastReceiver)
+        receiverRegistered = false
         super.onPause()
         viewModel.onPause()
     }
@@ -179,6 +188,21 @@ class AudioPlayerFragment : Fragment() {
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
             binding.overlay.isVisible = true
+        }
+        if (!receiverRegistered) {
+            val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                requireContext().registerReceiver(
+                    networkCheckBroadcastReceiver,
+                    filter,
+                    Context.RECEIVER_NOT_EXPORTED
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                requireContext().registerReceiver(networkCheckBroadcastReceiver, filter)
+            }
+            receiverRegistered = true
         }
     }
 
