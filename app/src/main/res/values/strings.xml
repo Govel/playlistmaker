@@ -62,4 +62,5 @@
         <item quantity="few">%d трека</item>
         <item quantity="many">%d треков</item>
     </plurals>
+    <string name="notification_permission_denied">Нет разрешения на уведомления</string>
 </resources>

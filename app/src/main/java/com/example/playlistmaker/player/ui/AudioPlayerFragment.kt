@@ -1,10 +1,18 @@
 package com.example.playlistmaker.player.ui
 
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -19,10 +27,11 @@ import com.example.playlistmaker.media.playlists.new_playlist.ui.NewPlaylistFrag
 import com.example.playlistmaker.player.ui.models.PlayerState
 import com.example.playlistmaker.player.ui.models.TrackOnPlaylistState
 import com.example.playlistmaker.search.domain.models.Track
+import com.example.playlistmaker.services.musicservice.MusicService
 import com.example.playlistmaker.util.LocalUtils
+import com.example.playlistmaker.util.NetworkCheckBroadcastReceiver
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import org.koin.android.ext.android.getKoin
-import org.koin.core.parameter.parametersOf
 
 class AudioPlayerFragment : Fragment() {
     private var _binding: FragmentAudioPlayerBinding? = null
@@ -37,7 +46,32 @@ class AudioPlayerFragment : Fragment() {
 
     private lateinit var viewModel: AudioPlayerViewModel
     private var shouldRestoreBottomSheet = false
+    private val networkCheckBroadcastReceiver = NetworkCheckBroadcastReceiver()
+    private var receiverRegistered = false
 
+    private var isServiceBound = false
+
+    private val serviceConnection = object : android.content.ServiceConnection {
+        override fun onServiceConnected(name: android.content.ComponentName?, service: android.os.IBinder?) {
+            val binder = service as MusicService.MusicServiceBinder
+            val playerService = binder.getService()
+            viewModel.attachService(playerService)
+
+            viewModel.observePlayerState()?.observe(viewLifecycleOwner) {
+                render(it)
+                binding.btPlay.setPlaying(it.isPlaying)
+                enableButton(it.isPlayButtonEnabled)
+                binding.tvTrackTime.text = it.progress
+            }
+
+            isServiceBound = true
+        }
+
+        override fun onServiceDisconnected(name: android.content.ComponentName?) {
+            viewModel.detachService()
+            isServiceBound = false
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -47,6 +81,11 @@ class AudioPlayerFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        if (isServiceBound) {
+            requireContext().unbindService(serviceConnection)
+            viewModel.detachService()
+            isServiceBound = false
+        }
         _binding = null
         super.onDestroyView()
     }
@@ -54,12 +93,21 @@ class AudioPlayerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.mtbArrowback.setNavigationOnClickListener {
+            viewModel.onScreenClosed()
             findNavController().navigateUp()
         }
         currentTrack = track
-        viewModel = getKoin().get {
-            parametersOf(currentTrack.previewUrl)
+        viewModel = getKoin().get()
+
+        requestNotificationPermissionIfNeeded()
+
+        val intent = Intent(requireContext(), MusicService::class.java).apply {
+            putExtra("extra_track_url", currentTrack.previewUrl)
+            putExtra("extra_track_name", currentTrack.trackName)
+            putExtra("extra_artist_name", currentTrack.artistName)
         }
+
+        requireContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
         Glide.with(binding.main.context).load(
             currentTrack.getCoverArtwork()
         ).placeholder(R.drawable.placeholder_cover).fitCenter().transform(
@@ -86,7 +134,7 @@ class AudioPlayerFragment : Fragment() {
         }
         binding.tvPrimaryGenreTrackName.text = currentTrack.primaryGenreName ?: ""
         binding.tvTrackCountry.text = currentTrack.country ?: ""
-        viewModel.observePlayerState().observe(viewLifecycleOwner) {
+        viewModel.observePlayerState()?.observe(viewLifecycleOwner) {
             render(it)
             binding.btPlay.setPlaying(it.isPlaying)
             enableButton(it.isPlayButtonEnabled)
@@ -165,9 +213,33 @@ class AudioPlayerFragment : Fragment() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        viewModel.onAppForegrounded()
+    }
+
+    private val notificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (!granted) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.notification_permission_denied),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+    override fun onStop() {
+        super.onStop()
+        if (hasNotificationPermission()) {
+            viewModel.onAppBackgrounded()
+        }
+    }
+
     override fun onPause() {
+        requireContext().unregisterReceiver(networkCheckBroadcastReceiver)
+        receiverRegistered = false
         super.onPause()
-        viewModel.onPause()
     }
 
     override fun onResume() {
@@ -179,6 +251,21 @@ class AudioPlayerFragment : Fragment() {
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
             binding.overlay.isVisible = true
+        }
+        if (!receiverRegistered) {
+            val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                requireContext().registerReceiver(
+                    networkCheckBroadcastReceiver,
+                    filter,
+                    Context.RECEIVER_NOT_EXPORTED
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                requireContext().registerReceiver(networkCheckBroadcastReceiver, filter)
+            }
+            receiverRegistered = true
         }
     }
 
@@ -230,6 +317,30 @@ class AudioPlayerFragment : Fragment() {
     private fun showContent() {
         binding.svPlayer.isVisible = true
         binding.pbPlayer.isVisible = false
+    }
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val granted = ContextCompat.checkSelfPermission(
+                requireContext(),
+                android.Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (!granted) {
+                notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
+    private fun hasNotificationPermission(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(
+                requireContext(),
+                android.Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
     }
 
 }
