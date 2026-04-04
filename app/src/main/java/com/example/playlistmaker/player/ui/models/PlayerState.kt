@@ -5,7 +5,6 @@ sealed class PlayerState(val isPlayButtonEnabled: Boolean, val isPlaying: Boolea
     class Prepared : PlayerState(true, PLAY, TIMER_START)
     class Playing(progress: String) : PlayerState(true, PAUSE, progress)
     class Paused(progress: String) : PlayerState(true, PLAY, progress)
-
     companion object {
         const val PLAY = false
         const val PAUSE = true

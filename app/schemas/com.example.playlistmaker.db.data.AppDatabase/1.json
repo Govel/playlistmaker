@@ -1,0 +1,235 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "c13d0f3c8798f0cf4f0891bd37b1c8c7",
+    "entities": [
+      {
+        "tableName": "favorite_tracks_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `trackId` INTEGER NOT NULL, `artworkUrl100` TEXT NOT NULL, `trackName` TEXT NOT NULL, `artistName` TEXT NOT NULL, `collectionName` TEXT, `releaseDate` TEXT, `primaryGenreName` TEXT, `country` TEXT, `trackTimeMillis` INTEGER NOT NULL, `previewUrl` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "trackId",
+            "columnName": "trackId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "artworkUrl100",
+            "columnName": "artworkUrl100",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "trackName",
+            "columnName": "trackName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "artistName",
+            "columnName": "artistName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "collectionName",
+            "columnName": "collectionName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "releaseDate",
+            "columnName": "releaseDate",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "primaryGenreName",
+            "columnName": "primaryGenreName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "country",
+            "columnName": "country",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "trackTimeMillis",
+            "columnName": "trackTimeMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "previewUrl",
+            "columnName": "previewUrl",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_favorite_tracks_table_trackId",
+            "unique": true,
+            "columnNames": [
+              "trackId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_favorite_tracks_table_trackId` ON `${TABLE_NAME}` (`trackId`)"
+          }
+        ]
+      },
+      {
+        "tableName": "playlists_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `imgPath` TEXT NOT NULL, `tracksList` TEXT NOT NULL, `totalTracks` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "imgPath",
+            "columnName": "imgPath",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tracksList",
+            "columnName": "tracksList",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "totalTracks",
+            "columnName": "totalTracks",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "tracks_into_playlists_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `trackId` INTEGER NOT NULL, `artworkUrl100` TEXT NOT NULL, `trackName` TEXT NOT NULL, `artistName` TEXT NOT NULL, `collectionName` TEXT, `releaseDate` TEXT, `primaryGenreName` TEXT, `country` TEXT, `trackTimeMillis` INTEGER NOT NULL, `previewUrl` TEXT, `isFavorite` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "trackId",
+            "columnName": "trackId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "artworkUrl100",
+            "columnName": "artworkUrl100",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "trackName",
+            "columnName": "trackName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "artistName",
+            "columnName": "artistName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "collectionName",
+            "columnName": "collectionName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "releaseDate",
+            "columnName": "releaseDate",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "primaryGenreName",
+            "columnName": "primaryGenreName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "country",
+            "columnName": "country",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "trackTimeMillis",
+            "columnName": "trackTimeMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "previewUrl",
+            "columnName": "previewUrl",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isFavorite",
+            "columnName": "isFavorite",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_tracks_into_playlists_table_trackId",
+            "unique": true,
+            "columnNames": [
+              "trackId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_tracks_into_playlists_table_trackId` ON `${TABLE_NAME}` (`trackId`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c13d0f3c8798f0cf4f0891bd37b1c8c7')"
+    ]
+  }
+}

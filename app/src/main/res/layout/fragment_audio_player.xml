@@ -297,9 +297,8 @@
         android:id="@+id/standard_bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/main_bg_color"
+        android:background="@drawable/rounded_playlist_tracks"
         android:orientation="vertical"
-        android:visibility="gone"
         app:behavior_hideable="true"
         app:behavior_peekHeight="505dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">

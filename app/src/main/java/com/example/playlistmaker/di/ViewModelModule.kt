@@ -19,8 +19,8 @@ val viewModelModule = module {
     viewModel {
         SettingsViewModel(get(), get())
     }
-    viewModel { (url: String) ->
-        AudioPlayerViewModel(url, get(), get(), get())
+    viewModel {
+        AudioPlayerViewModel(get(), get(), get())
     }
     viewModel {
         FavoriteTracksViewModel(get())

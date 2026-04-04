@@ -2,10 +2,9 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     id("kotlin-parcelize")
-    id("androidx.navigation.safeargs.kotlin") version "2.9.7"
-    id("com.google.devtools.ksp") version "2.3.4" apply true
+    alias(libs.plugins.androidx.navigation)
+    alias(libs.plugins.google.ksp) apply true
 }
 
 kotlin {

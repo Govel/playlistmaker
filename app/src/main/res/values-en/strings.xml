@@ -57,4 +57,5 @@
         <item quantity="one">%d track</item>
         <item quantity="other">%d tracks</item>
     </plurals>
+    <string name="notification_permission_denied">No permission for notifications</string>
 </resources>
