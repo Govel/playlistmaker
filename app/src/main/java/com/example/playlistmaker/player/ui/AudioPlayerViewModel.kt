@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.db.domain.api.FavoriteTrackInteractor
 import com.example.playlistmaker.db.domain.api.PlaylistsInteractor
@@ -18,7 +17,6 @@ import com.example.playlistmaker.player.ui.models.TrackIds
 import com.example.playlistmaker.player.ui.models.TrackOnPlaylistState
 import com.example.playlistmaker.search.domain.models.Track
 import com.google.gson.Gson
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class AudioPlayerViewModel(
@@ -37,18 +35,20 @@ class AudioPlayerViewModel(
     private val isInPlaylist = MutableLiveData<Pair<String, Boolean>>()
     fun observeIsInPlaylist(): LiveData<Pair<String, Boolean>> = isInPlaylist
 
+    private val _playerState = MutableLiveData<PlayerState>(PlayerState.Default())
+    fun observePlayerState(): LiveData<PlayerState> = _playerState
+
     fun attachService(service: AudioPlayerControl) {
         playerService = service
+        viewModelScope.launch {
+            playerService?.getPlayerState()?.collect { state ->
+                _playerState.value = state
+            }
+        }
     }
 
     fun detachService() {
         playerService = null
-    }
-
-
-    fun observePlayerState(): LiveData<PlayerState>? {
-        val flow: StateFlow<PlayerState> = playerService?.getPlayerState() ?: return null
-        return flow.asLiveData()
     }
 
     fun onPlayButtonClicked() {
@@ -156,5 +156,9 @@ class AudioPlayerViewModel(
             Log.e("PlaylistsViewModel", "Ошибка загрузки обложки: $coverName", e)
             null
         }
+    }
+
+    fun refreshPlayerState() {
+        _playerState.value = _playerState.value
     }
 }

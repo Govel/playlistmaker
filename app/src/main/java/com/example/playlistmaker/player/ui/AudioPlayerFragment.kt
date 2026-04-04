@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -58,14 +59,7 @@ class AudioPlayerFragment : Fragment() {
             val binder = service as MusicService.MusicServiceBinder
             val playerService = binder.getService()
             viewModel.attachService(playerService)
-
-            viewModel.observePlayerState()?.observe(viewLifecycleOwner) {
-                render(it)
-                binding.btPlay.setPlaying(it.isPlaying)
-                enableButton(it.isPlayButtonEnabled)
-                binding.tvTrackTime.text = it.progress
-            }
-
+            viewModel.refreshPlayerState()
             isServiceBound = true
         }
 
@@ -103,6 +97,14 @@ class AudioPlayerFragment : Fragment() {
 
         requestNotificationPermissionIfNeeded()
 
+        viewModel.observePlayerState().observe(viewLifecycleOwner) { state ->
+            Log.d("AudioPlayer", "PlayerState updated: $state")
+            render(state)
+            binding.btPlay.setPlaying(state.isPlaying)
+            enableButton(state.isPlayButtonEnabled)
+            binding.tvTrackTime.text = state.progress
+        }
+
         val intent = Intent(requireContext(), MusicService::class.java).apply {
             putExtra("extra_track_url", currentTrack.previewUrl)
             putExtra("extra_track_name", currentTrack.trackName)
@@ -136,12 +138,12 @@ class AudioPlayerFragment : Fragment() {
         }
         binding.tvPrimaryGenreTrackName.text = currentTrack.primaryGenreName ?: ""
         binding.tvTrackCountry.text = currentTrack.country ?: ""
-        viewModel.observePlayerState()?.observe(viewLifecycleOwner) {
-            render(it)
-            binding.btPlay.setPlaying(it.isPlaying)
-            enableButton(it.isPlayButtonEnabled)
-            binding.tvTrackTime.text = it.progress
-        }
+//        viewModel.observePlayerState()?.observe(viewLifecycleOwner) {
+//            render(it)
+//            binding.btPlay.setPlaying(it.isPlaying)
+//            enableButton(it.isPlayButtonEnabled)
+//            binding.tvTrackTime.text = it.progress
+//        }
 
         viewModel.showPlaylists()
 
