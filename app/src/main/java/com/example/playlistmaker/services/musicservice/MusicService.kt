@@ -33,9 +33,10 @@ internal class MusicService: Service(), AudioPlayerControl {
     private var timerJob: Job? = null
     private var trackName: String = ""
     private var artistName: String = ""
+    private val serviceScope = CoroutineScope(Dispatchers.Default + Job())
 
     private fun startTimer() {
-        timerJob = CoroutineScope(Dispatchers.Default).launch {
+        timerJob = serviceScope.launch {
             while (mediaPlayer?.isPlaying == true) {
                 delay(TIMER_DELAY)
                 _playerState.value = PlayerState.Playing(getCurrentPlayerPosition())
@@ -96,6 +97,7 @@ internal class MusicService: Service(), AudioPlayerControl {
 
     private fun releasePlayer() {
         timerJob?.cancel()
+        serviceScope.coroutineContext[Job]?.cancel()
         mediaPlayer?.stop()
         _playerState.value = PlayerState.Default()
         mediaPlayer?.setOnPreparedListener(null)
