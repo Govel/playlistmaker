@@ -1,8 +1,10 @@
 package com.example.playlistmaker.player.ui
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.os.Build
@@ -51,8 +53,8 @@ class AudioPlayerFragment : Fragment() {
 
     private var isServiceBound = false
 
-    private val serviceConnection = object : android.content.ServiceConnection {
-        override fun onServiceConnected(name: android.content.ComponentName?, service: android.os.IBinder?) {
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: android.os.IBinder?) {
             val binder = service as MusicService.MusicServiceBinder
             val playerService = binder.getService()
             viewModel.attachService(playerService)
@@ -67,7 +69,7 @@ class AudioPlayerFragment : Fragment() {
             isServiceBound = true
         }
 
-        override fun onServiceDisconnected(name: android.content.ComponentName?) {
+        override fun onServiceDisconnected(name: ComponentName?) {
             viewModel.detachService()
             isServiceBound = false
         }
