@@ -1,9 +1,11 @@
 package com.example.playlistmaker.root.ui
 
+import android.R.style.Theme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,7 +27,7 @@ fun Header(text: String) {
         Text(
             text = text,
             style = TextStyle(
-                color = YpBlack,
+                color = MaterialTheme.colorScheme.onPrimary,
                 fontSize = 24.sp,
                 fontStyle = FontStyle.Normal,
                 fontFamily = yandexDisplayFonts,

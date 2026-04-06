@@ -58,4 +58,5 @@
         <item quantity="other">%d tracks</item>
     </plurals>
     <string name="notification_permission_denied">No permission for notifications</string>
+    <string name="looking_for">You were looking for</string>
 </resources>
