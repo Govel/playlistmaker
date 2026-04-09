@@ -8,7 +8,11 @@ import com.example.playlistmaker.db.domain.api.FavoriteTrackInteractor
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.search.domain.repository.TracksInteractor
 import com.example.playlistmaker.search.ui.model.SearchMessage
+import com.example.playlistmaker.search.ui.model.SearchState
 import com.example.playlistmaker.util.debounce
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
@@ -17,6 +21,13 @@ class SearchViewModel(
 ) : ViewModel() {
     private var isSearchInProgress = false
     private val stateSearchLiveData = MutableLiveData<SearchState>()
+    private var _historyTracks = MutableStateFlow<List<Track>>(emptyList())
+    val historyTracks: StateFlow<List<Track>> = _historyTracks.asStateFlow()
+    init {
+        viewModelScope.launch {
+            _historyTracks.value = tracksInteractor.loadTracksFromHistory()
+        }
+    }
     fun observeStateSearch(): LiveData<SearchState> = stateSearchLiveData
     private val tracksSearchDebounce = debounce<String>(
         SEARCH_DEBOUNCE_DELAY,
@@ -26,6 +37,10 @@ class SearchViewModel(
     private var latestSearchText: String? = null
 
     fun searchDebounce(changedText: String) {
+        if (changedText.isBlank()) {
+            stateSearchLiveData.value = SearchState.StandBy
+            return
+        }
         if (latestSearchText != changedText) {
             latestSearchText = changedText
             tracksSearchDebounce(changedText)
@@ -35,6 +50,11 @@ class SearchViewModel(
     fun searchImmediately(query: String) {
         latestSearchText = query
         searchRequest(query)
+    }
+
+    fun clearHistory() {
+        tracksInteractor.clearHistory()
+        _historyTracks.value = emptyList()
     }
 
     private fun searchRequest(newSearchText: String) {
@@ -95,20 +115,12 @@ class SearchViewModel(
         stateSearchLiveData.postValue(state)
     }
 
-    fun saveTrackToHistory(clickedTrack: Track) = tracksInteractor.saveTrackToHistory(clickedTrack)
-
-    fun clearHistory() = tracksInteractor.clearHistory()
-
-    fun loadTracksFromHistory(): List<Track> {
-        val tracks = tracksInteractor.loadTracksFromHistory()
+    fun saveTrackToHistory(clickedTrack: Track) {
+        tracksInteractor.saveTrackToHistory(clickedTrack)
         viewModelScope.launch {
-            favoriteTrackInteractor
-                .getFavoriteTrackId()
-                .collect { favoriteTracks ->
-                    favoriteTrackProcessResult(favoriteTracks, tracks)
-                }
+            val updatedTracks = tracksInteractor.loadTracksFromHistory()
+            _historyTracks.value = updatedTracks
         }
-        return tracks
     }
 
     companion object {
