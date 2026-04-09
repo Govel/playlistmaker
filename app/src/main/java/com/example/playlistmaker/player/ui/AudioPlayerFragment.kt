@@ -9,7 +9,6 @@ import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -98,7 +97,6 @@ class AudioPlayerFragment : Fragment() {
         requestNotificationPermissionIfNeeded()
 
         viewModel.observePlayerState().observe(viewLifecycleOwner) { state ->
-            Log.d("AudioPlayer", "PlayerState updated: $state")
             render(state)
             binding.btPlay.setPlaying(state.isPlaying)
             enableButton(state.isPlayButtonEnabled)
