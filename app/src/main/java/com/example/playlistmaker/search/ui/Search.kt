@@ -1,6 +1,5 @@
 package com.example.playlistmaker.search.ui
 
-import android.app.appsearch.SearchResult
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,27 +18,28 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,278 +53,56 @@ import com.example.playlistmaker.root.ui.Header
 import com.example.playlistmaker.root.ui.PlaylistMakerTheme
 import com.example.playlistmaker.root.ui.YpBlack
 import com.example.playlistmaker.root.ui.YpBlue
-import com.example.playlistmaker.root.ui.YpLightGray
 import com.example.playlistmaker.root.ui.yandexDisplayFonts
 import com.example.playlistmaker.search.domain.models.Track
+import com.example.playlistmaker.search.ui.model.SearchState
 import com.example.playlistmaker.util.LocalUtils
 
 
 @Composable
-fun Search() {
-    var text by remember { mutableStateOf("") }
-    var tracks by remember {
-        mutableStateOf(
-            listOf(
-
-                Track(
-                    1451960630,
-                    "Горы по колено",
-                    "Max Korzh",
-                    239910,
-                    "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/11/05/11/1105112a-7f78-9bb8-93c3-9fe1aa028ac1/mzaf_11336116043782615341.plus.aac.p.m4a",
-                    "Малый повзрослел, Ч. 2",
-                    "2017-10-25T12:00:00Z",
-                    "Hip-Hop/Rap",
-                    "USA",
-                    true
-                ),
-                Track(
-                    1451960631,
-                    "Горы по колено",
-                    "Max Korzh",
-                    239910,
-                    "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/11/05/11/1105112a-7f78-9bb8-93c3-9fe1aa028ac1/mzaf_11336116043782615341.plus.aac.p.m4a",
-                    "Малый повзрослел, Ч. 2",
-                    "2017-10-25T12:00:00Z",
-                    "Hip-Hop/Rap",
-                    "USA",
-                    true
-                ),Track(
-                    1451960632,
-                    "Горы по колено",
-                    "Max Korzh",
-                    239910,
-                    "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/11/05/11/1105112a-7f78-9bb8-93c3-9fe1aa028ac1/mzaf_11336116043782615341.plus.aac.p.m4a",
-                    "Малый повзрослел, Ч. 2",
-                    "2017-10-25T12:00:00Z",
-                    "Hip-Hop/Rap",
-                    "USA",
-                    true
-                ),
-                Track(
-                    1451960633,
-                    "Горы по колено",
-                    "Max Korzh",
-                    239910,
-                    "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/11/05/11/1105112a-7f78-9bb8-93c3-9fe1aa028ac1/mzaf_11336116043782615341.plus.aac.p.m4a",
-                    "Малый повзрослел, Ч. 2",
-                    "2017-10-25T12:00:00Z",
-                    "Hip-Hop/Rap",
-                    "USA",
-                    true
-                ),
-                Track(
-                    1451960634,
-                    "Горы по колено",
-                    "Max Korzh",
-                    239910,
-                    "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/11/05/11/1105112a-7f78-9bb8-93c3-9fe1aa028ac1/mzaf_11336116043782615341.plus.aac.p.m4a",
-                    "Малый повзрослел, Ч. 2",
-                    "2017-10-25T12:00:00Z",
-                    "Hip-Hop/Rap",
-                    "USA",
-                    true
-                ),
-                Track(
-                    1451960635,
-                    "Горы по колено",
-                    "Max Korzh",
-                    239910,
-                    "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/11/05/11/1105112a-7f78-9bb8-93c3-9fe1aa028ac1/mzaf_11336116043782615341.plus.aac.p.m4a",
-                    "Малый повзрослел, Ч. 2",
-                    "2017-10-25T12:00:00Z",
-                    "Hip-Hop/Rap",
-                    "USA",
-                    true
-                ),
-                Track(
-                    1451960636,
-                    "Горы по колено",
-                    "Max Korzh",
-                    239910,
-                    "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/11/05/11/1105112a-7f78-9bb8-93c3-9fe1aa028ac1/mzaf_11336116043782615341.plus.aac.p.m4a",
-                    "Малый повзрослел, Ч. 2",
-                    "2017-10-25T12:00:00Z",
-                    "Hip-Hop/Rap",
-                    "USA",
-                    true
-                ),
-                Track(
-                    1451960637,
-                    "Горы по колено",
-                    "Max Korzh",
-                    239910,
-                    "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/11/05/11/1105112a-7f78-9bb8-93c3-9fe1aa028ac1/mzaf_11336116043782615341.plus.aac.p.m4a",
-                    "Малый повзрослел, Ч. 2",
-                    "2017-10-25T12:00:00Z",
-                    "Hip-Hop/Rap",
-                    "USA",
-                    true
-                ),
-                Track(
-                    1451960638,
-                    "Горы по колено",
-                    "Max Korzh",
-                    239910,
-                    "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/11/05/11/1105112a-7f78-9bb8-93c3-9fe1aa028ac1/mzaf_11336116043782615341.plus.aac.p.m4a",
-                    "Малый повзрослел, Ч. 2",
-                    "2017-10-25T12:00:00Z",
-                    "Hip-Hop/Rap",
-                    "USA",
-                    true
-                ),
-                Track(
-                    1451960639,
-                    "Горы по колено",
-                    "Max Korzh",
-                    239910,
-                    "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/11/05/11/1105112a-7f78-9bb8-93c3-9fe1aa028ac1/mzaf_11336116043782615341.plus.aac.p.m4a",
-                    "Малый повзрослел, Ч. 2",
-                    "2017-10-25T12:00:00Z",
-                    "Hip-Hop/Rap",
-                    "USA",
-                    true
-                ),
-                Track(
-                    1451960640,
-                    "Горы по колено",
-                    "Max Korzh",
-                    239910,
-                    "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/11/05/11/1105112a-7f78-9bb8-93c3-9fe1aa028ac1/mzaf_11336116043782615341.plus.aac.p.m4a",
-                    "Малый повзрослел, Ч. 2",
-                    "2017-10-25T12:00:00Z",
-                    "Hip-Hop/Rap",
-                    "USA",
-                    true
-                ),
-                Track(
-                    1451960641,
-                    "Горы по колено",
-                    "Max Korzh",
-                    239910,
-                    "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/11/05/11/1105112a-7f78-9bb8-93c3-9fe1aa028ac1/mzaf_11336116043782615341.plus.aac.p.m4a",
-                    "Малый повзрослел, Ч. 2",
-                    "2017-10-25T12:00:00Z",
-                    "Hip-Hop/Rap",
-                    "USA",
-                    true
-                ),
-                Track(
-                    1451960642,
-                    "Горы по колено",
-                    "Max Korzh",
-                    239910,
-                    "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/11/05/11/1105112a-7f78-9bb8-93c3-9fe1aa028ac1/mzaf_11336116043782615341.plus.aac.p.m4a",
-                    "Малый повзрослел, Ч. 2",
-                    "2017-10-25T12:00:00Z",
-                    "Hip-Hop/Rap",
-                    "USA",
-                    true
-                ),
-                Track(
-                    1451960643,
-                    "Горы по колено",
-                    "Max Korzh",
-                    239910,
-                    "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/11/05/11/1105112a-7f78-9bb8-93c3-9fe1aa028ac1/mzaf_11336116043782615341.plus.aac.p.m4a",
-                    "Малый повзрослел, Ч. 2",
-                    "2017-10-25T12:00:00Z",
-                    "Hip-Hop/Rap",
-                    "USA",
-                    true
-                ),
-                Track(
-                    1451960645,
-                    "Горы по колено",
-                    "Max Korzh",
-                    239910,
-                    "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/11/05/11/1105112a-7f78-9bb8-93c3-9fe1aa028ac1/mzaf_11336116043782615341.plus.aac.p.m4a",
-                    "Малый повзрослел, Ч. 2",
-                    "2017-10-25T12:00:00Z",
-                    "Hip-Hop/Rap",
-                    "USA",
-                    true
-                ),
-                Track(
-                    1451960644,
-                    "Горы по колено",
-                    "Max Korzh",
-                    239910,
-                    "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/11/05/11/1105112a-7f78-9bb8-93c3-9fe1aa028ac1/mzaf_11336116043782615341.plus.aac.p.m4a",
-                    "Малый повзрослел, Ч. 2",
-                    "2017-10-25T12:00:00Z",
-                    "Hip-Hop/Rap",
-                    "USA",
-                    true
-                ),
-                Track(
-                    1451960646,
-                    "Горы по колено",
-                    "Max Korzh",
-                    239910,
-                    "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/11/05/11/1105112a-7f78-9bb8-93c3-9fe1aa028ac1/mzaf_11336116043782615341.plus.aac.p.m4a",
-                    "Малый повзрослел, Ч. 2",
-                    "2017-10-25T12:00:00Z",
-                    "Hip-Hop/Rap",
-                    "USA",
-                    true
-                ),
-                Track(
-                    1451960647,
-                    "Горы по колено",
-                    "Max Korzh",
-                    239910,
-                    "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/11/05/11/1105112a-7f78-9bb8-93c3-9fe1aa028ac1/mzaf_11336116043782615341.plus.aac.p.m4a",
-                    "Малый повзрослел, Ч. 2",
-                    "2017-10-25T12:00:00Z",
-                    "Hip-Hop/Rap",
-                    "USA",
-                    true
-                ),
-
-            )
-        )
-    }
-    Surface(
-        color = MaterialTheme.colorScheme.primary
+fun Search(
+    historyTracks: List<Track>,
+    state: SearchState,
+    textFieldText: String,
+    searchTextField: (String) -> Unit,
+    updateResult: () -> Unit,
+    onTrackClick: (Track) -> Unit,
+    clearHistory: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(vertical = 48.dp)
-        ) {
-            Header(stringResource(R.string.search))
-            SearchTextField(text) { newText -> text = newText }
-            SearchResult(tracks)
-//            SearchHistory(tracks)
-//            SearchEmpty()
-//            SearchError { Log.d("MyTag", "Click!") }
+        Header(stringResource(R.string.search))
+        SearchTextField(
+            query = textFieldText,
+            onValueChanged = searchTextField,
+            onSearch = { query ->
+                searchTextField(query)
+                updateResult()
+            },
+            onClear = {
+                searchTextField("")},)
+
+        if (textFieldText.isEmpty() &&
+            historyTracks.isNotEmpty() &&
+            state is SearchState.StandBy) {
+            SearchHistory(
+                tracks = historyTracks,
+                onClick = onTrackClick,
+                clearHistory = clearHistory
+            )
         }
+        Render(state = state, onTrackClick = onTrackClick, onUpdateClick = updateResult)
     }
 }
 
+
 @Composable
 fun SearchTextField(
-    query: String, onValueChanged: (String) -> Unit
+    query: String, onValueChanged: (String) -> Unit, onSearch: (String) -> Unit, onClear: () -> Unit,
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
     Box(
         modifier = Modifier
             .height(52.dp)
@@ -362,6 +140,16 @@ fun SearchTextField(
                     .padding(start = 8.dp),
                 singleLine = true,
                 cursorBrush = SolidColor(YpBlue),
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        onSearch(query)
+                        keyboardController?.hide()
+                    }
+
+                ),
                 decorationBox = { innerTextField ->
                     Box {
                         if (query.isEmpty()) {
@@ -379,20 +167,38 @@ fun SearchTextField(
                     }
                 }
             )
-            Icon(
-                painter = painterResource(id = R.drawable.clean_the_search_query),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onTertiary,
-                modifier = Modifier
-                    .size(16.dp)
-                    .clickable(onClick = { Log.d("MyTag", "Click!") })
-            )
+            if (query.isNotEmpty()) {
+                Icon(
+                    painter = painterResource(id = R.drawable.clean_the_search_query),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onTertiary,
+                    modifier = Modifier
+                        .size(16.dp)
+                        .clickable(onClick = {
+                            onClear()
+                        })
+                )
+            }
         }
     }
 }
 
 @Composable
-fun SearchHistory(tracks: List<Track>) {
+fun SearchProgressBar() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(44.dp),
+            color = YpBlue,
+            strokeWidth = 4.dp,
+        )
+    }
+}
+
+@Composable
+fun SearchHistory(tracks: List<Track>, onClick: (Track) -> Unit, clearHistory: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -411,7 +217,9 @@ fun SearchHistory(tracks: List<Track>) {
         }
         Spacer(modifier = Modifier.height(8.dp))
         LazyColumn(
-            modifier = Modifier.fillMaxWidth().weight(1f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f, fill = false),
         ) {
             items(
                 items = tracks,
@@ -421,10 +229,10 @@ fun SearchHistory(tracks: List<Track>) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(60.dp)
-                        .clickable(onClick = { Log.d("MyTag", "Click!") }),
+                        .clickable(onClick = { onClick(track) }),
                     verticalAlignment = Alignment.CenterVertically,
 
-                ) {
+                    ) {
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current).data(track.artworkUrl100)
                             .crossfade(true).build(),
@@ -432,8 +240,9 @@ fun SearchHistory(tracks: List<Track>) {
                         placeholder = painterResource(R.drawable.placeholder_cover),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .size(45.dp)
-                            .padding(start = 12.dp, top = 8.dp, bottom = 8.dp),
+                            .height(45.dp)
+                            .padding(start = 12.dp)
+                            .aspectRatio(1f)
                     )
 
                     Column(
@@ -493,9 +302,9 @@ fun SearchHistory(tracks: List<Track>) {
             }
         }
         Button(
-            onClick = { Log.d("MyTag", "Click!") },
+            onClick = clearHistory,
             modifier = Modifier
-                .padding(bottom = 12.dp)
+                .padding(top = 24.dp, bottom = 12.dp)
                 .height(36.dp),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onPrimary),
             shape = RoundedCornerShape(54.dp)
@@ -515,14 +324,16 @@ fun SearchHistory(tracks: List<Track>) {
 }
 
 @Composable
-fun SearchResult(tracks: List<Track>) {
+fun SearchResult(tracks: List<Track>, onClick: (Track) -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(16.dp))
         LazyColumn(
-            modifier = Modifier.fillMaxWidth().weight(1f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
         ) {
             items(
                 items = tracks,
@@ -532,12 +343,13 @@ fun SearchResult(tracks: List<Track>) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(60.dp)
-                        .clickable(onClick = { Log.d("MyTag", "Click!") }),
+                        .clickable(onClick = { onClick(track) }),
                     verticalAlignment = Alignment.CenterVertically,
 
                     ) {
                     AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current).data(track.artworkUrl100)
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(track.artworkUrl100)
                             .crossfade(true).build(),
                         contentDescription = "artwork url",
                         placeholder = painterResource(R.drawable.placeholder_cover),
@@ -685,11 +497,32 @@ fun SearchError(onClick: () -> Unit) {
     }
 }
 
+@Composable
+fun Render(state: SearchState, onTrackClick: (Track) -> Unit, onUpdateClick: () -> Unit) {
+    when (state) {
+        is SearchState.Loading -> SearchProgressBar()
+        is SearchState.Content -> SearchResult(state.tracks, onTrackClick)
+        is SearchState.Empty -> SearchEmpty()
+        is SearchState.Error -> SearchError(onClick = onUpdateClick)
+        else -> {}
+    }
+}
+
 @Preview(name = "main", device = "spec:parent=pixel_9,navigation=buttons", showSystemUi = true)
 @Composable
 fun Preview() {
     PlaylistMakerTheme(darkTheme = false) {
-        Search()
+        Surface(color = MaterialTheme.colorScheme.primary) {
+            Search(
+                state = SearchState.Error("Error"),
+                textFieldText = "",
+                searchTextField = {Log.d("","")},
+                updateResult = {Log.d("","")},
+                onTrackClick = {Log.d("","")},
+                historyTracks = listOf(Track(123,"","",123,"","","","","","",true)),
+                clearHistory = {}
+            )
+        }
     }
 }
 
@@ -697,6 +530,16 @@ fun Preview() {
 @Composable
 fun PreviewDark() {
     PlaylistMakerTheme(darkTheme = true) {
-        Search()
+        Surface(color = MaterialTheme.colorScheme.primary) {
+            Search(
+                state = SearchState.StandBy,
+                textFieldText = "",
+                searchTextField = {Log.d("","")},
+                updateResult = {Log.d("","")},
+                onTrackClick = {Log.d("","")},
+                historyTracks = listOf(Track(123,"","",123,"","","","","","",true)),
+                clearHistory = {}
+            )
+        }
     }
 }

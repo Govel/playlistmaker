@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.util.Log
 import android.widget.Toast
 
 class NetworkCheckBroadcastReceiver : BroadcastReceiver() {
@@ -21,7 +20,6 @@ class NetworkCheckBroadcastReceiver : BroadcastReceiver() {
 
         if (!hasInternet) {
             Toast.makeText(context, "Отсутствует подключение к интернету", Toast.LENGTH_SHORT).show()
-            Log.d("MyTag", "Отсутствует подключение к интернету")
         }
     }
 }

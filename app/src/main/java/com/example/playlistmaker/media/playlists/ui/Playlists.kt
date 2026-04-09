@@ -1,6 +1,6 @@
 package com.example.playlistmaker.media.playlists.ui
 
-import android.util.Log
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,19 +19,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -46,84 +43,54 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.playlistmaker.R
 import com.example.playlistmaker.media.playlists.new_playlist.domain.models.Playlist
+import com.example.playlistmaker.media.playlists.ui.models.PlaylistsState
 import com.example.playlistmaker.root.ui.PlaylistMakerTheme
-import com.example.playlistmaker.root.ui.YpBlack
 import com.example.playlistmaker.root.ui.yandexDisplayFonts
 
 @Composable
-fun Playlists() {
-    var playlists by remember {
-        mutableStateOf(
-            listOf(
-                Playlist(
-                    id = 1,
-                    name = "123",
-                    description = "123",
-                    imgPath = "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    tracksList = "",
-                    totalTracks = 0
-                ),
-                Playlist(
-                    id = 2,
-                    name = "321",
-                    description = "123",
-                    imgPath = "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    tracksList = "",
-                    totalTracks = 2
-                ),
-                Playlist(
-                    id = 3,
-                    name = "456",
-                    description = "123",
-                    imgPath = "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    tracksList = "",
-                    totalTracks = 2
-                ),
-                Playlist(
-                    id = 4,
-                    name = "765",
-                    description = "123",
-                    imgPath = "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/87/28/20/872820bb-3eb6-e8a3-1703-12a7874126cf/cover.jpg/100x100bb.jpg",
-                    tracksList = "",
-                    totalTracks = 5
-                ),
-            )
-        )
-    }
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.primary
+fun Playlists(
+    state: PlaylistsState,
+    onClickNewPlaylist: () -> Unit,
+    onPlaylistClick: (Playlist) -> Unit,
+    viewModel: PlaylistsViewModel
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+        Button(
+            onClick = onClickNewPlaylist,
+            modifier = Modifier
+                .padding(top = 24.dp)
+                .height(36.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onPrimary),
+            shape = RoundedCornerShape(54.dp)
         ) {
-            Button(
-                onClick = { Log.d("ButtonPreview", "Кнопка нажата") },
-                modifier = Modifier
-                    .padding(top = 24.dp)
-                    .height(36.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onPrimary),
-                shape = RoundedCornerShape(54.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.new_playlist),
-                    style = TextStyle(
-                        color = MaterialTheme.colorScheme.primary,
-                        fontSize = 16.sp,
-                        fontStyle = FontStyle.Normal,
-                        fontFamily = yandexDisplayFonts,
-                        fontWeight = FontWeight.Medium,
-                    )
+            Text(
+                text = stringResource(R.string.new_playlist),
+                style = TextStyle(
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 16.sp,
+                    fontStyle = FontStyle.Normal,
+                    fontFamily = yandexDisplayFonts,
+                    fontWeight = FontWeight.Medium,
                 )
-            }
-            Spacer(modifier = Modifier.padding(bottom = 8.dp))
-            PlaylistList(playlists)
+            )
         }
+        Spacer(modifier = Modifier.padding(bottom = 8.dp))
+        Render(
+            state = state,
+            onClick = onPlaylistClick,
+            viewModel = viewModel
+            )
     }
 }
 
 @Composable
-fun PlaylistList(playlists: List<Playlist>) {
+fun PlaylistList(
+    playlists: List<Playlist>,
+    onClick: (Playlist) -> Unit,
+    viewModel: PlaylistsViewModel
+) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(8.dp),
@@ -131,16 +98,27 @@ fun PlaylistList(playlists: List<Playlist>) {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(playlists) { item ->
-            PlaylistCard(item)
+            PlaylistCard(
+                playlist = item,
+                onClick = { onClick(item)},
+                viewModel = viewModel
+            )
         }
     }
 }
 
 @Composable
-fun PlaylistCard(playlist: Playlist) {
-    Column(modifier = Modifier.clickable(onClick = {Log.d("MyTag", "Click!")})) {
+fun PlaylistCard(
+    playlist: Playlist,
+    onClick: (Playlist) -> Unit,
+    viewModel: PlaylistsViewModel
+) {
+    val imageUri = remember(playlist.imgPath) {
+        playlist.imgPath.let { viewModel.getUriForCover(it) }
+    }
+    Column(modifier = Modifier.clickable(onClick = { onClick(playlist) })) {
         AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current).data(playlist.imgPath)
+            model = ImageRequest.Builder(LocalContext.current).data(imageUri ?: R.drawable.placeholder_cover)
                 .crossfade(true).build(),
             placeholder = painterResource(R.drawable.placeholder_cover),
             contentDescription = null,
@@ -164,7 +142,11 @@ fun PlaylistCard(playlist: Playlist) {
             overflow = TextOverflow.Ellipsis
         )
         Text(
-            text = playlist.totalTracks.toString(),
+            text = pluralStringResource(
+                id = R.plurals.tracks,
+                count = playlist.totalTracks,
+                playlist.totalTracks
+                ),
             style = TextStyle(
                 color = MaterialTheme.colorScheme.onPrimary,
                 fontSize = 12.sp,
@@ -202,10 +184,17 @@ fun PlaylistsEmpty() {
     }
 }
 
+@Composable
+fun Render(state: PlaylistsState, onClick: (Playlist) -> Unit, viewModel: PlaylistsViewModel) {
+    when (state) {
+        is PlaylistsState.Empty -> PlaylistsEmpty()
+        is PlaylistsState.Content -> PlaylistList(playlists = state.playlists, onClick = onClick, viewModel = viewModel)
+    }
+}
+
 @Preview(name = "main", device = "spec:parent=pixel_9,navigation=buttons", showSystemUi = true)
 @Composable
 fun Preview() {
     PlaylistMakerTheme(darkTheme = true) {
-        Playlists()
     }
 }

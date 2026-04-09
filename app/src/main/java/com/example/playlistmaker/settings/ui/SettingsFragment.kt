@@ -4,16 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import com.example.playlistmaker.databinding.FragmentSettingsBinding
+import com.example.playlistmaker.root.ui.PlaylistMakerTheme
+import com.example.playlistmaker.settings.domain.model.ThemeSettings
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.getValue
 
 
 class SettingsFragment : Fragment() {
-    private var _binding: FragmentSettingsBinding? = null
-    private val binding get() = _binding!!
     private val viewModel by viewModel<SettingsViewModel>()
 
 
@@ -22,42 +23,34 @@ class SettingsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-    override fun onDestroyView() {
-        _binding = null
-        super.onDestroyView()
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding.share.setOnClickListener {
-            viewModel.dispatchExternalNavigator(
-                ExternalNavigatorState.Share
-            )
+        return ComposeView(requireContext()).apply {
+            setContent {
+                val isCheckedState = viewModel.observeThemeSettingsLiveData()
+                    .observeAsState(initial = ThemeSettings(false))
+                PlaylistMakerTheme(darkTheme = isCheckedState.value.isChecked) {
+                    Surface(color = MaterialTheme.colorScheme.primary) {
+                        Settings(
+                            isChecked = isCheckedState.value.isChecked,
+                            themeSwitcher = viewModel::switchMode,
+                            shareApp = {
+                                viewModel.dispatchExternalNavigator(
+                                    ExternalNavigatorState.Share
+                                )
+                            },
+                            writeInSupport = {
+                                viewModel.dispatchExternalNavigator(
+                                    ExternalNavigatorState.Support
+                                )
+                            },
+                            userAgreement = {
+                                viewModel.dispatchExternalNavigator(
+                                    ExternalNavigatorState.Terms
+                                )
+                            }
+                        )
+                    }
+                }
+            }
         }
-        binding.writeInSupport.setOnClickListener {
-            viewModel.dispatchExternalNavigator(
-                ExternalNavigatorState.Support
-            )
-        }
-        binding.userAgreement.setOnClickListener {
-            viewModel.dispatchExternalNavigator(
-                ExternalNavigatorState.Terms
-            )
-        }
-        viewModel.observeThemeSettingsLiveData().observe(viewLifecycleOwner) {
-            setThemeSwitch(it.isChecked)
-        }
-        binding.themeSwitcher.setOnClickListener { viewModel.switchMode(binding.themeSwitcher.isChecked) }
-    }
-    override fun onResume() {
-        super.onResume()
-        setThemeSwitch(viewModel.getCurrentTheme())
-    }
-
-    fun setThemeSwitch(isChecked: Boolean) {
-        binding.themeSwitcher.isChecked = isChecked
     }
 }
